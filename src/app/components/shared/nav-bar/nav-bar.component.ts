@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BoardService } from 'src/app/providers/board.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavBarComponent implements OnInit {
 
-  constructor() { }
+  constructor(private boardService: BoardService) { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  initializeBoard = () => {
+    this.boardService.createBoard()
+      .then((docRef) => console.log(docRef));
   }
 
 }
