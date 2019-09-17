@@ -1,1 +1,22 @@
-<p>new-board works!</p>
+<div class="row my-2">
+    <form (ngSubmit)="createBoard()" #form="ngForm" class="col">
+        <div class="form-group">
+            <mat-form-field appearance="outline" class="d-block">
+                <mat-label>Nombre del juego</mat-label>
+                <input matInput placeholder="En familia" required
+                    name="name" #name="ngModel" [(ngModel)]="board.name">
+            </mat-form-field>
+        </div>
+        <div class="form-group">
+            <mat-form-field appearance="outline" class="d-block">
+                <mat-label>Tu nombre</mat-label>
+                <input matInput placeholder="Xavier Lopez" required
+                    name="hostName" #hostName="ngModel" [(ngModel)]="board.hostName">
+            </mat-form-field>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button mat-stroked-button color="warn" type="button" [routerLink]="['/']">Cancelar</button>
+            <button mat-stroked-button class="ml-2" type="submit" [disabled]="form.invalid">Iniciar</button>
+        </div>
+    </form>
+</div>

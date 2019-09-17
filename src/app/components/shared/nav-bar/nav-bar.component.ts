@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BoardService } from 'src/app/providers/board.service';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-nav-bar',
@@ -8,13 +10,21 @@ import { BoardService } from 'src/app/providers/board.service';
 })
 export class NavBarComponent implements OnInit {
 
-  constructor(private boardService: BoardService) { }
+  showPlayButton: boolean = false;
 
-  ngOnInit() { }
+  constructor(private boardService: BoardService,
+              private router: Router,
+              private location: Location) {
+  }
+
+  ngOnInit() {
+    this.router.events.subscribe(() => this.showPlayButton =
+      this.location.path().startsWith('/board') ? false : true);
+    
+  }
 
   initializeBoard = () => {
-    this.boardService.createBoard()
-      .then((docRef) => console.log(docRef));
+    this.router.navigate(["board","new"]);
   }
 
 }

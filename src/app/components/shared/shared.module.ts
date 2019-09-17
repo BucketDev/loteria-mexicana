@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { MaterialModule } from 'src/app/material/material.module';
 
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { LoadingComponent } from './loading/loading.component';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
@@ -15,11 +17,14 @@ import { LoadingComponent } from './loading/loading.component';
   ],
   imports: [
     CommonModule,
+    RouterModule,
     MaterialModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatProgressBarModule
   ],
   exports: [
-    NavBarComponent
+    NavBarComponent,
+    LoadingComponent
   ]
 })
 export class SharedModule { }
