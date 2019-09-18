@@ -1,9 +1,11 @@
-<mat-toolbar color="primary" class="d-flex justify-content-between">
-  <div>
-      <img src="https://png.icons8.com/cotton/watermelon--v1/32" alt="logo" class="pb-2">
-      <span>Loteria Mexicana</span>
-  </div>
-  <button mat-flat-button color="warn" (click)="initializeBoard()" *ngIf="showPlayButton">
-    Jugar
-  </button>
+<mat-toolbar color="primary">
+    <mat-toolbar-row class="d-flex justify-content-between">
+      <div>
+          <img src="https://png.icons8.com/cotton/watermelon--v1/32" alt="logo" class="pb-2">
+          <span>Loteria Mexicana</span>
+      </div>
+      <button mat-flat-button color="warn" (click)="initializeBoard()" *ngIf="showPlayButton">
+        Jugar
+      </button>
+    </mat-toolbar-row>
 </mat-toolbar>

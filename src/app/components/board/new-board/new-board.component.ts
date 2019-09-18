@@ -21,7 +21,10 @@ export class NewBoardComponent implements OnInit {
     this.board = {
       name: '',
       hostName: '',
-      creationDate: new Date()
+      creationDate: new Date(),
+      gameStarted: false,
+      gameWon: false,
+      players: []
     }
   }
 

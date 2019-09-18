@@ -12,7 +12,7 @@ export class NavBarComponent implements OnInit {
 
   showPlayButton: boolean = false;
 
-  constructor(private boardService: BoardService,
+  constructor(public boardService: BoardService,
               private router: Router,
               private location: Location) {
   }

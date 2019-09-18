@@ -1,1 +1,48 @@
-<p>host-board works!</p>
+<div *ngIf="board">
+    <mat-toolbar>
+        <mat-toolbar-row class="d-flex justify-content-between">
+            <h1>{{ board.name }}</h1>
+            <button mat-flat-button (click)="copyToClipboard()">
+                    <img src="https://png.icons8.com/cotton/copy/24" alt="copiar">
+                    <img src="https://png.icons8.com/cotton/share/24" alt="copiar" class="ml-2">
+            </button>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="d-flex justify-content-center py-5" *ngIf="board.players.length === 0">
+        <span class="h3 text-muted">Waiting for players</span>
+    </div>
+    <p class="text-muted text-right h6 m-1 mr-4" *ngIf="board.gameStarted && cards && playingCards">
+        Restanes: {{ calculateRest() }}</p>
+    <div *ngIf="board.players.length > 0" class="p-2">
+        <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center">
+            <span class="d-flex justify-content-center align-items-center deck mat-elevation-z2 bg-light">
+                Da clic en iniciar
+            </span>
+        </div>
+        <ng-template #gameStarted>
+            <div *ngIf="cards && playingCards">
+                <div *ngIf="playingCards.length === 0; else cardsLeft" class="d-flex flex-column align-items-center">
+                    <span class="d-flex justify-content-center align-items-center deck mat-elevation-z2 bg-light">
+                        <img src="https://png.icons8.com/color/galo-de-barcelos/128" alt="mezclar">
+                    </span>
+                </div>
+                <ng-template #cardsLeft>
+                    <div *ngIf="playingCards" class="d-flex flex-column align-items-center">
+                        <div class="deck mat-elevation-z2" matRipple (click)="nextCard()"
+                            [style.background-image]="playingCards[playingCards.length - 1].url | uriStyleSanitizer">
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </ng-template>
+        <div class="d-flex justify-content-around align-items-center m-2">
+            <button mat-raised-button type="button" (click)="shuffleDeck()"
+                    [disabled]="!playingCards || cards.length >= playingCards.length">
+                <img src="https://png.icons8.com/cotton/synchronize--v2/24" alt="mezclar">
+            </button>
+            <span class="text-muted h6">Jugadores: {{ board.players.length }}</span>
+            <button mat-raised-button color="accent" type="button" class="ml-2" (click)="startGame()"
+                    [disabled]="!board.gameWon && board.gameStarted">Iniciar</button>
+        </div>
+    </div>
+</div>

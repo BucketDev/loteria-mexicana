@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { HostBoardComponent } from './host-board/host-board.component';
 import { PlayerBoardComponent } from './player-board/player-board.component';
 import { MaterialModule } from 'src/app/material/material.module';
+import { UriStyleSanitizerPipe } from 'src/app/pipes/uri-style-sanitizer.pipe';
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { MaterialModule } from 'src/app/material/material.module';
   declarations: [
     NewBoardComponent,
     HostBoardComponent,
-    PlayerBoardComponent
+    PlayerBoardComponent,
+    UriStyleSanitizerPipe
   ],
   exports: []
 })

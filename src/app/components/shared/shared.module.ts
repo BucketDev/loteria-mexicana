@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { MaterialModule } from 'src/app/material/material.module';
@@ -19,7 +18,6 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     RouterModule,
     MaterialModule,
-    MatToolbarModule,
     MatProgressBarModule
   ],
   exports: [
