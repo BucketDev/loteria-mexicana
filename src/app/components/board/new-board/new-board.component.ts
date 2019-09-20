@@ -18,13 +18,14 @@ export class NewBoardComponent implements OnInit {
   constructor(private boardService: BoardService,
               private loadingService: LoadingService,
               private router: Router) {
+    this.boardService.displayNavBar = true;
     this.board = {
       name: '',
       hostName: '',
+      cardHistory: [],
       creationDate: new Date(),
       gameStarted: false,
-      gameWon: false,
-      players: []
+      gameWon: false
     }
   }
 

@@ -20,7 +20,6 @@ export class CardService {
         let card: Card;
         card = {
           uid: docSnapshot.id,
-          number: _card['number'],
           url: _card['url']
         }
         cards.push(card);

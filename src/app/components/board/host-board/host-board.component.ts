@@ -7,6 +7,7 @@ import { Board } from 'src/app/models/board.interface';
 import { CardService } from 'src/app/providers/card.service';
 import { LoadingService } from 'src/app/providers/loading.service';
 import { Card } from 'src/app/models/card.interface';
+import { Player } from 'src/app/models/player.interface';
 
 @Component({
   selector: 'app-host-board',
@@ -17,22 +18,25 @@ export class HostBoardComponent implements OnInit {
 
   board: Board;
   cards: Card[];
-  playingCards: Card[];
+  players: Player[];
+  playingCards: Card[] = [];
 
   constructor(private boardService: BoardService,
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
               private snackBar: MatSnackBar) {
+    this.boardService.displayNavBar = false;
     this.loadingService.loading = true;
     this.activatedRoute.params.subscribe(params => {
       this.boardService.getBoard(params['uid'])
         .subscribe((board: Board) => {
-          console.log(board);
           this.board = board;
+          this.boardService.getPLayers(board.uid).subscribe((players: Player[]) => this.players = players)
           !this.cards && this.cardService.getCards()
             .subscribe((cards: Card[]) => {
               this.cards = cards;
+              console.table(cards)
               this.initializeDeck();
               this.loadingService.loading = false;
             });
@@ -48,42 +52,41 @@ export class HostBoardComponent implements OnInit {
           return historyCard.uid === card.uid;
         })
       })
-      this.playingCards.push({
-        number: 0,
-        url: '/assets/img/back.jpg'
-      })
+      if(this.board.cardHistory.length < this.cards.length)
+        this.playingCards.push(this.board.cardHistory[this.board.cardHistory.length - 1])
     }
   }
 
-  shuffleDeck = (cloudSave: boolean = true) => {
-    if (this.playingCards[this.playingCards.length - 1].number === 0)
-      this.playingCards.pop();
+  shuffleDeck = () => {
     let array = this.playingCards;
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
     [...this.board.currentDeck] = [...this.playingCards];
-    cloudSave && this.updateCloudBoard();
+    this.updateCloudBoard();
     this.snackBar.open('Se ha mezclado la baraja', 'Yay!', {
       duration: 1500,
     });
-    this.playingCards.push({
-      number: 0,
-      url: '/assets/img/back.jpg'
-    })
   }
 
   startGame = () => {
     [...this.playingCards] = [...this.cards];
-    this.shuffleDeck(false);
+    this.shuffleDeck();
     this.board.gameStarted = true;
+    this.board.gameWon = false;
+    this.board.cardHistory = [this.playingCards[this.playingCards.length -1]];
+    this.updateCloudBoard();
+  }
+  
+  finishGame = () => {
+    this.board.gameStarted = false;
     this.board.cardHistory = [];
     this.updateCloudBoard();
   }
 
   nextCard = () => {
-    let card = this.playingCards.pop();
+    this.playingCards.pop();
     if (this.playingCards.length > 0) {
       this.board.cardHistory.push(this.playingCards[this.playingCards.length - 1]);
       this.updateCloudBoard();
@@ -98,7 +101,7 @@ export class HostBoardComponent implements OnInit {
     );
   }
 
-  calculateRest = () => this.playingCards.length === 0 ? `0/${this.cards.length}` : `${this.playingCards.length - 1}/${this.cards.length}`
+  calculateRest = () => this.playingCards.length === 0 ? `0/${this.cards.length}` : `${this.playingCards.length}/${this.cards.length}`
 
   ngOnInit() { }
 

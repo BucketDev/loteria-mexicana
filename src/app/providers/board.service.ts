@@ -3,6 +3,7 @@ import { map } from 'rxjs/operators';
 import { AngularFirestore, DocumentReference, DocumentSnapshot } from '@angular/fire/firestore';
 
 import { Board } from '../models/board.interface';
+import { Player } from '../models/player.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,8 @@ import { Board } from '../models/board.interface';
 export class BoardService {
 
   collectionName: string = 'boards';
+  collectionPlayerName: string = 'players';
+  displayNavBar: boolean = true;
 
   constructor(private db: AngularFirestore) { }
 
@@ -24,7 +27,6 @@ export class BoardService {
         name: board['name'],
         hostName: board['hostName'],
         creationDate: board['creationDate'],
-        players: board['players'],
         gameStarted: board['gameStarted'],
         gameWon: board['gameWon'],
         cardHistory: board['cardHistory'],
@@ -32,6 +34,9 @@ export class BoardService {
       }
       return board;
     }));
+
+  getPLayers = (uid: string) => this.db.collection(this.collectionName).doc(uid).collection(this.collectionPlayerName)
+    .snapshotChanges().pipe(map(data =>  data.map(player => player.payload.doc.data())))
 
   update = (uid: string, board: Board) => this.db.collection(this.collectionName).doc(uid).update(board);
 }

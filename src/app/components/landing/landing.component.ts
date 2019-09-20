@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BoardService } from 'src/app/providers/board.service';
 
 @Component({
   selector: 'app-landing',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LandingComponent implements OnInit {
 
-  constructor() { }
+  constructor(private boardService: BoardService) {
+    this.boardService.displayNavBar = true;
+  }
 
   ngOnInit() {
   }

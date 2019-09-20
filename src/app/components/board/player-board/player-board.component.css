@@ -1,0 +1,31 @@
+.board {
+    height: 360;
+    width: 228;
+    max-width: 228px;
+}
+
+.card {
+    height: 90px;
+    width: 57px;
+    min-width: 57px;
+    background-position: center;
+    background-size: cover;
+}
+
+.card-history {
+    height: 180px;
+    width: 114px;
+    min-width: 114px;
+    background-position: center;
+    background-size: cover;
+}
+
+.chip {
+    display: none;
+    align-items: center;
+    flex-direction: column;
+}
+
+.selected > .chip {
+    display: flex;
+}

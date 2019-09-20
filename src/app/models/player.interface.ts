@@ -1,5 +1,8 @@
+import { Card } from './card.interface';
+
 export interface Player {
     uid?: string,
     name: string,
-    board: number[][]
+    boardUid: string,
+    board?: Card[]
 }
