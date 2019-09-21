@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  endpointURL: 'https://vanfigo.github.io',
   firebaseConfig: {
     apiKey: "AIzaSyAoPg6cjJj5BFb6QdkL-gjdSXCmU8FzeBQ",
     authDomain: "loteria-mexicana-b991e.firebaseapp.com",

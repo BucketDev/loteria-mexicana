@@ -27,16 +27,14 @@ export class BoardService {
         name: board['name'],
         hostName: board['hostName'],
         creationDate: board['creationDate'],
+        playersNumber: board['playersNumber'],
         gameStarted: board['gameStarted'],
         gameWon: board['gameWon'],
-        cardHistory: board['cardHistory'],
-        currentDeck: board['currentDeck']
+        winners: board['winners'],
+        cardHistory: board['cardHistory']
       }
       return board;
     }));
 
-  getPLayers = (uid: string) => this.db.collection(this.collectionName).doc(uid).collection(this.collectionPlayerName)
-    .snapshotChanges().pipe(map(data =>  data.map(player => player.payload.doc.data())))
-
-  update = (uid: string, board: Board) => this.db.collection(this.collectionName).doc(uid).update(board);
+  update = (board: Board) => this.db.collection(this.collectionName).doc(board.uid).update(board);
 }

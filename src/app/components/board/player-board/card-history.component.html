@@ -1,0 +1,8 @@
+<mat-progress-bar *ngIf="data.lastCards" color="primary" [value]="progressbarValue" mode="determinate"></mat-progress-bar>
+<div class="d-flex overflow-auto card-history-container">
+    <div class="d-flex">
+        <div class="rounded card-history mat-elevation-z8" *ngFor="let card of cardHistory"
+            [style.background-image]="card.url | uriStyleSanitizer">
+        </div>
+    </div>
+</div>

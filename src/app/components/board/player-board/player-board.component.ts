@@ -1,77 +1,96 @@
 import { Component, OnInit } from '@angular/core';
-import { Board } from 'src/app/models/board.interface';
-import { Card } from 'src/app/models/card.interface';
+import { ActivatedRoute } from '@angular/router';
+import { DocumentReference } from '@angular/fire/firestore';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { LoadingService } from 'src/app/providers/loading.service';
 import { BoardService } from 'src/app/providers/board.service';
 import { CardService } from 'src/app/providers/card.service';
-import { LoadingService } from 'src/app/providers/loading.service';
-import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { PlayerService } from 'src/app/providers/player.service';
-import { DocumentReference } from '@angular/fire/firestore';
+
+import { Board } from 'src/app/models/board.interface';
+import { Card } from 'src/app/models/card.interface';
 import { Player } from 'src/app/models/player.interface';
+import { CardHistoryComponent } from './card-history.component';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
+import { PlayerNameComponent } from './player-name.component';
 
 @Component({
   selector: 'app-player-board',
   templateUrl: './player-board.component.html',
   styleUrls: ['./player-board.component.css']
 })
-export class PlayerBoardComponent implements OnInit {
+export class PlayerBoardComponent {
 
   board: Board;
   cards: Card[];
-  cardsSelected: Card[] = [];
   player: Player;
 
   constructor(private boardService: BoardService,
-              private playerService: PlayerService,
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
+              private bottomSheet: MatBottomSheet,
+              public dialog: MatDialog,
               private snackBar: MatSnackBar) {
     this.boardService.displayNavBar = false;
+    
+    this.cards = this.cardService.getCards();
+    
     this.loadingService.loading = true;
     this.activatedRoute.params.subscribe(params => {
       let boardUid = params['uid'];
       this.boardService.getBoard(boardUid)
         .subscribe((board: Board) => {
+          let show = false;
+          if(this.board && this.board.cardHistory.length < board.cardHistory.length) {
+            show = true;
+          }
           this.board = board;
+          show && this.showHistory(true);
+          !this.player && this.addPlayer();
           this.initializeBoard();
-        });
-      this.cardService.getCards()
-        .subscribe((cards: Card[]) => {
-          this.cards = cards;
           this.loadingService.loading = false;
-          this.addPlayer(boardUid);
         });
     });
   }
 
-  addPlayer = (boardUid: string) => {
+  addPlayer = () => {
     let player: Player = JSON.parse( localStorage.getItem('player') );
-    if (!player || player.boardUid !== boardUid) {
-      player = { name: 'Rodrigo Loyola', board: [], boardUid };
-      this.playerService.createPlayer(boardUid, player)
-        .then((data: DocumentReference) => {
-          this.player = player;
-          this.player.uid = data.id;
-          localStorage.setItem('player', JSON.stringify(player));
-          this.shuffleBoard();
-      })
+    if (!player || player.boardUid !== this.board.uid) {
+      this.player = {
+        name: 'Rodrigo Loyola',
+        boardUid: this.board.uid,
+        playerBoard: []
+      }
+      this.shuffleBoard();
+      localStorage.setItem('player', JSON.stringify(this.player));
+      this.board.playersNumber++;
+      this.updateName();
+      this.updateCloudBoard();
     } else {
-      this.loadingService.loading = true;
-      this.playerService.getPlayer(boardUid, player.uid).subscribe((player: Player) => {
-        this.loadingService.loading = false;
-        this.player = player;
-      })
+      this.player = player;
     }
+  }
+
+  updateName = () => {
+    const dialogRef = this.dialog.open(PlayerNameComponent, {
+      disableClose: true,
+      data: {
+        name: ''
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.player = JSON.parse( localStorage.getItem('player') );
+      this.player.name = result;
+      localStorage.setItem('player', JSON.stringify(this.player));
+    });
   }
 
   initializeBoard = () => {
     if(!this.board.gameStarted) {
-      this.cardsSelected = [];
-      document.querySelectorAll('.card').forEach(element => {
-        element.classList.remove('selected');
-      });
+      this.player.playerBoard.forEach(card => card.selected = false);
+      localStorage.setItem('player', JSON.stringify(this.player));
     }
   }
 
@@ -81,52 +100,52 @@ export class PlayerBoardComponent implements OnInit {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
-    [...this.player.board] = [...this.cards].splice(0, 16);
-    this.updateCloudPlayer();
-    this.snackBar.open('Se ha creado un nuevo tablero', 'Yay!', {
+    [...this.player.playerBoard] = [...this.cards].splice(0, 16);
+    localStorage.setItem('player', JSON.stringify(this.player));
+    this.snackBar.open('Se ha creado un nuevo tablero', '', {
       duration: 1500,
     });
   }
 
-  updateCloudPlayer = () => {
-    this.loadingService.loading = true;
-    this.playerService.update(this.board.uid, this.player).then(
-      success =>  this.loadingService.loading = false,
-      error => console.log(error)
-    );
-  }
-
-  cardSelected = (card: Card, selector: HTMLElement) => {
+  cardSelected = (card: Card) => {
     let found = this.board.cardHistory.some(_card => _card.uid === card.uid);
     if (found) {
-      let alreadySelected = selector.classList.contains('selected');
-      if (!alreadySelected) {
-        selector.classList.add("selected");
-        this.cardsSelected.push(card);
-        if(this.gameWon()) {
+      if (!card.selected) {
+        card.selected = true;
+        if(!this.board.gameWon && this.gameWon()) {
+          this.board.gameWon = true;
+          this.board.winners.push(this.player.name);
+          this.updateCloudBoard();
           this.snackBar.open('Ganaste!', 'Yay!', {
             duration: 1500,
           });
-          this.board.gameWon = true;
-          this.updateCloudBoard();
         }
       }
-      this.updateCloudPlayer();
+      localStorage.setItem('player', JSON.stringify(this.player));
     }
   }
 
   // TODO validate the board setup
-  gameWon = () => this.cardsSelected.length === this.player.board.length;
+  gameWon = () => this.player.playerBoard
+    .reduce((total, card) => total + (card.selected ? 1 : 0), 0) === this.player.playerBoard.length;
+  
+    getWinners = () => this.board.winners.join(', ');
 
   updateCloudBoard = () => {
     this.loadingService.loading = true;
-    this.boardService.update(this.board.uid, this.board).then(
+    this.boardService.update(this.board).then(
       success =>  this.loadingService.loading = false,
       error => console.log(error)
     );
   }
 
-  ngOnInit() {
+  showHistory = (lastCards: boolean = false) => {
+    let ref = this.bottomSheet.open(CardHistoryComponent, {
+      data: {
+        cardHistory: [...this.board.cardHistory],
+        lastCards
+      }
+    });
   }
 
 }

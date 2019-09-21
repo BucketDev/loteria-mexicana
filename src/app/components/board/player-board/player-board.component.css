@@ -1,21 +1,13 @@
 .board {
-    height: 360;
-    width: 228;
-    max-width: 228px;
+    height: 450px;
+    width: 285px;
+    max-width: 285px;
 }
 
 .card {
-    height: 90px;
-    width: 57px;
-    min-width: 57px;
-    background-position: center;
-    background-size: cover;
-}
-
-.card-history {
-    height: 180px;
-    width: 114px;
-    min-width: 114px;
+    height: 112.5px;
+    width: 71.25px;
+    min-width: 71.25px;
     background-position: center;
     background-size: cover;
 }

@@ -7,8 +7,9 @@ export interface Board {
     hostName: string,
     creationDate: Date,
     cardHistory?: Card[],
-    currentDeck?: Card[],
     players?: Player[],
+    playersNumber: number,
     gameStarted: boolean,
-    gameWon: boolean
+    gameWon: boolean,
+    winners: string[]
 }

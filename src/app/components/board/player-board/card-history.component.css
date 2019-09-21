@@ -1,0 +1,15 @@
+.card-history {
+    height: 180px;
+    width: 114px;
+    min-width: 114px;
+    background-position: center;
+    background-size: cover;
+}
+
+.card-history:not(:first-child) {
+    margin-left: -50px;
+}
+
+.card-history-container {
+  scroll-behavior: smooth;
+}

@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  endpointURL: 'localhost:4200',
   firebaseConfig: {
     apiKey: "AIzaSyAoPg6cjJj5BFb6QdkL-gjdSXCmU8FzeBQ",
     authDomain: "loteria-mexicana-b991e.firebaseapp.com",

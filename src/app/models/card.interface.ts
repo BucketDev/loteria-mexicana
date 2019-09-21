@@ -1,4 +1,5 @@
 export interface Card {
-    uid?: string,
-    url: string
+    uid: number,
+    url: string,
+    selected?: boolean
 }

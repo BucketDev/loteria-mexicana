@@ -7,6 +7,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRippleModule } from '@angular/material/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   imports: [
@@ -17,7 +20,10 @@ import { MatChipsModule } from '@angular/material/chips';
     MatSnackBarModule,
     MatRippleModule,
     MatBadgeModule,
-    MatChipsModule
+    MatChipsModule,
+    MatBottomSheetModule,
+    MatTooltipModule,
+    MatDialogModule
   ],
   exports: [
     MatButtonModule,
@@ -27,7 +33,10 @@ import { MatChipsModule } from '@angular/material/chips';
     MatSnackBarModule,
     MatRippleModule,
     MatBadgeModule,
-    MatChipsModule
+    MatChipsModule,
+    MatBottomSheetModule,
+    MatTooltipModule,
+    MatDialogModule
   ]
 })
 export class MaterialModule { }

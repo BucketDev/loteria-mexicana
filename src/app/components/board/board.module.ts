@@ -8,20 +8,33 @@ import { HostBoardComponent } from './host-board/host-board.component';
 import { PlayerBoardComponent } from './player-board/player-board.component';
 import { MaterialModule } from 'src/app/material/material.module';
 import { UriStyleSanitizerPipe } from 'src/app/pipes/uri-style-sanitizer.pipe';
+import { SettingsBoardComponent } from './settings-board/settings-board.component';
+import { CardHistoryComponent } from './player-board/card-history.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { PlayerNameComponent } from './player-board/player-name.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     RouterModule,
-    MaterialModule
+    MaterialModule,
+    MatProgressBarModule
   ],
   declarations: [
     NewBoardComponent,
     HostBoardComponent,
     PlayerBoardComponent,
-    UriStyleSanitizerPipe
+    UriStyleSanitizerPipe,
+    SettingsBoardComponent,
+    CardHistoryComponent,
+    PlayerNameComponent
   ],
-  exports: []
+  exports: [],
+  entryComponents: [
+    SettingsBoardComponent,
+    CardHistoryComponent,
+    PlayerNameComponent
+  ]
 })
 export class BoardModule { }

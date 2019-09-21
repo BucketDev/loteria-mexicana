@@ -8,22 +8,18 @@ import { Card } from '../models/card.interface';
 })
 export class CardService {
 
-  collectionName: string = 'cards';
+  constructor() { }
 
-  constructor(private db: AngularFirestore) { }
+  getCards = () => {
+    let cards: Card[] = []
+    for(let idx = 1; idx <= 54; idx++) {
+      let card: Card = {
+        uid: idx,
+        url: `assets/img/${idx}.jpg`
+      }
+      cards.push(card);
+    }
+    return cards;
+  }
 
-  getCards = () => this.db.collection(this.collectionName)
-    .get().pipe(map(data => {
-      let cards: Card[] = []
-      data.docs.forEach(docSnapshot => {
-        let _card = docSnapshot.data();
-        let card: Card;
-        card = {
-          uid: docSnapshot.id,
-          url: _card['url']
-        }
-        cards.push(card);
-      });
-      return cards;
-    }));
 }
