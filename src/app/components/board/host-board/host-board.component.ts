@@ -101,16 +101,25 @@ export class HostBoardComponent implements OnInit {
 
   ngOnInit() { }
 
-  copyToClipboard = () => {
+  copyAndShare = () => {
     let url = `${environment.endpointURL}/board/${this.board.uid}/player`;
     let _this = this;
-    navigator.clipboard.writeText(url).then(function() {
-      _this.snackBar.open('El link se copio a tu clipboard', 'Yay!', {
-        duration: 3000,
+    if (window.navigator && window.navigator['share']) {
+      window.navigator['share']({
+        title: 'WebShare API Demo',
+        url
+      }).then(() => {
+        console.log('Thanks for sharing!');
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url).then(function() {
+        _this.snackBar.open('Se copió el enlace con éxito', '', {
+          duration: 3000,
+        });
+      }, function(err) {
+        console.error('Async: Could not copy text: ', err);
       });
-    }, function(err) {
-      console.error('Async: Could not copy text: ', err);
-    });
+    }
   }
 
   openSettings = () => {
