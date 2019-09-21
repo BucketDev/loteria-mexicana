@@ -11,7 +11,6 @@ import { Player } from '../models/player.interface';
 export class BoardService {
 
   collectionName: string = 'boards';
-  collectionPlayerName: string = 'players';
   displayNavBar: boolean = true;
 
   constructor(private db: AngularFirestore) { }
@@ -27,7 +26,6 @@ export class BoardService {
         name: board['name'],
         hostName: board['hostName'],
         creationDate: board['creationDate'],
-        playersNumber: board['playersNumber'],
         gameStarted: board['gameStarted'],
         gameWon: board['gameWon'],
         winners: board['winners'],

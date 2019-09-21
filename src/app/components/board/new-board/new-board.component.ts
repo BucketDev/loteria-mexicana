@@ -23,7 +23,6 @@ export class NewBoardComponent implements OnInit {
       name: '',
       hostName: '',
       cardHistory: [],
-      playersNumber: 0,
       creationDate: new Date(),
       gameStarted: false,
       gameWon: false,

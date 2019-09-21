@@ -14,6 +14,7 @@ import { CardHistoryComponent } from './card-history.component';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerNameComponent } from './player-name.component';
+import { PlayerService } from 'src/app/providers/player.service';
 
 @Component({
   selector: 'app-player-board',
@@ -27,6 +28,7 @@ export class PlayerBoardComponent {
   player: Player;
 
   constructor(private boardService: BoardService,
+              private playerService: PlayerService,
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
@@ -34,61 +36,56 @@ export class PlayerBoardComponent {
               public dialog: MatDialog,
               private snackBar: MatSnackBar) {
     this.boardService.displayNavBar = false;
+    this.loadingService.loading = true;
     
     this.cards = this.cardService.getCards();
     
-    this.loadingService.loading = true;
     this.activatedRoute.params.subscribe(params => {
+      this.addPlayer(params['uid']);
       let boardUid = params['uid'];
       this.boardService.getBoard(boardUid)
         .subscribe((board: Board) => {
+          //TODO try to split the card history into another collection
           let show = false;
           if(this.board && this.board.cardHistory.length < board.cardHistory.length) {
             show = true;
           }
           this.board = board;
           show && this.showHistory(true);
-          !this.player && this.addPlayer();
-          this.initializeBoard();
+          !this.board.gameStarted && this.initializeBoard();
           this.loadingService.loading = false;
         });
     });
   }
 
-  addPlayer = () => {
+  addPlayer = (uid: string) => {
     let player: Player = JSON.parse( localStorage.getItem('player') );
-    if (!player || player.boardUid !== this.board.uid) {
-      this.player = {
-        name: 'Rodrigo Loyola',
-        boardUid: this.board.uid,
-        playerBoard: []
-      }
-      this.shuffleBoard();
-      localStorage.setItem('player', JSON.stringify(this.player));
-      this.board.playersNumber++;
+    if (!player || player.boardUid !== uid) {
       this.updateName();
-      this.updateCloudBoard();
     } else {
       this.player = player;
     }
   }
 
   updateName = () => {
-    const dialogRef = this.dialog.open(PlayerNameComponent, {
-      disableClose: true,
-      data: {
-        name: ''
-      }
-    });
+    const dialogRef = this.dialog.open(PlayerNameComponent, { disableClose: true, data: { name: '' } });
     dialogRef.afterClosed().subscribe(result => {
-      this.player = JSON.parse( localStorage.getItem('player') );
-      this.player.name = result;
-      localStorage.setItem('player', JSON.stringify(this.player));
+      this.player = {
+        name: result,
+        boardUid: this.board.uid,
+        playerBoard: []
+      }
+      this.shuffleBoard();
+      this.playerService.createPlayer(this.board.uid, this.player)
+        .then((data: DocumentReference) => {
+          this.player.uid = data.id;
+          localStorage.setItem('player', JSON.stringify(this.player));
+        });
     });
   }
 
   initializeBoard = () => {
-    if(!this.board.gameStarted) {
+    if(this.player) {
       this.player.playerBoard.forEach(card => card.selected = false);
       localStorage.setItem('player', JSON.stringify(this.player));
     }

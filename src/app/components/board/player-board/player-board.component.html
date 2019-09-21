@@ -11,7 +11,7 @@
                 <img src="https://png.icons8.com/cotton/synchronize--v2/24" alt="mezclar">
             </button>
         </mat-toolbar-row>
-        <mat-toolbar-row *ngIf="board.playersNumber > 0" class="d-flex justify-content-between"
+        <mat-toolbar-row class="d-flex justify-content-between"
             color="primary">
             <span *ngIf="!board.gameStarted; else gameStarted">Por iniciar</span>
             <ng-template #gameStarted>
@@ -31,7 +31,7 @@
             </button>
         </mat-toolbar-row>
     </mat-toolbar>
-    <div *ngIf="player.playerBoard" class="d-flex flex-column align-items-center">
+    <div *ngIf="player" class="d-flex flex-column align-items-center">
         <div class="board d-flex flex-wrap mat-elevation-z4 my-3">
             <div *ngFor="let card of player.playerBoard" [ngClass]="{'selected': card.selected}"
                 class="card justify-content-center" matRipple (click)="cardSelected(card)"

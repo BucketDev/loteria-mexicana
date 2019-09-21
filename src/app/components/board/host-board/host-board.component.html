@@ -11,7 +11,7 @@
                 <img src="https://png.icons8.com/cotton/copy/24" alt="copiar">
             </button>
         </mat-toolbar-row>
-        <mat-toolbar-row *ngIf="board.playersNumber > 0" class="d-flex justify-content-between">
+        <mat-toolbar-row *ngIf="players && players.length > 0" class="d-flex justify-content-between">
             <div>
                 <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
                     <mat-chip color="primary" selected="true" *ngFor="let winner of board.winners"
@@ -35,12 +35,12 @@
             </div>
         </mat-toolbar-row>
     </mat-toolbar>
-    <span *ngIf="board.playersNumber === 0" class="d-block py-5 h3 text-muted text-center">Esperando al primer jugador</span>
-    <div *ngIf="board.playersNumber > 0">
+    <span *ngIf="!players || players.length === 0; else playersArrived" class="d-block py-5 h3 text-muted text-center">Esperando al primer jugador</span>
+    <ng-template #playersArrived>
         <div class="d-flex m-2">
             <div class="col d-flex flex-column align-items-start">
                 <h6 class="m-0">En linea
-                    <span class="d-block badge badge-info">{{ board.playersNumber }}</span></h6>
+                    <span class="d-block badge badge-info">{{ players.length }}</span></h6>
             </div>
             <div class="col d-flex flex-column align-items-end">
                 <h6 *ngIf="board.gameStarted" class="m-0">Cartas
@@ -70,5 +70,5 @@
                 </div>
             </ng-template>
         </div>
-    </div>
+    </ng-template>
 </div>

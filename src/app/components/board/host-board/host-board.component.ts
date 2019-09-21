@@ -11,6 +11,8 @@ import { Card } from 'src/app/models/card.interface';
 import { environment } from '../../../../environments/environment';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { SettingsBoardComponent } from '../settings-board/settings-board.component';
+import { Player } from 'src/app/models/player.interface';
+import { PlayerService } from 'src/app/providers/player.service';
 
 @Component({
   selector: 'app-host-board',
@@ -20,10 +22,12 @@ import { SettingsBoardComponent } from '../settings-board/settings-board.compone
 export class HostBoardComponent implements OnInit {
 
   board: Board;
+  players: Player[];
   cards: Card[];
   playingCards: Card[] = [];
 
   constructor(private boardService: BoardService,
+              private playersService: PlayerService,
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
@@ -39,6 +43,7 @@ export class HostBoardComponent implements OnInit {
           this.initializeDeck();
           this.loadingService.loading = false;
         });
+      this.playersService.getPlayers(params['uid']).subscribe((players: Player[]) => this.players = players);
     });
   }
 
