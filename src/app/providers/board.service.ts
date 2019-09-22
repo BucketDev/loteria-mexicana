@@ -15,10 +15,10 @@ export class BoardService {
 
   constructor(private db: AngularFirestore) { }
 
-  createBoard = (board: Board): Promise<DocumentReference> => 
+  post = (board: Board): Promise<DocumentReference> => 
     this.db.collection(this.collectionName).add(board);
 
-  getBoard = (id: string) => this.db.collection(this.collectionName).doc(id)
+  get = (id: string) => this.db.collection(this.collectionName).doc(id)
     .snapshotChanges().pipe(map(data => {
       let board = data.payload.data();
       board = {
@@ -28,11 +28,10 @@ export class BoardService {
         creationDate: board['creationDate'],
         gameStarted: board['gameStarted'],
         gameWon: board['gameWon'],
-        winners: board['winners'],
-        cardHistory: board['cardHistory']
+        winners: board['winners']
       }
       return board;
     }));
 
-  update = (board: Board) => this.db.collection(this.collectionName).doc(board.uid).update(board);
+  put = (board: Board) => this.db.collection(this.collectionName).doc(board.uid).update(board);
 }

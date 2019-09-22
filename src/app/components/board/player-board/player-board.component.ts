@@ -15,6 +15,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerNameComponent } from './player-name.component';
 import { PlayerService } from 'src/app/providers/player.service';
+import { CardHistoryService } from 'src/app/providers/card-history.service';
 
 @Component({
   selector: 'app-player-board',
@@ -24,11 +25,14 @@ import { PlayerService } from 'src/app/providers/player.service';
 export class PlayerBoardComponent {
 
   board: Board;
+  cardHistory: Card[];
+
   cards: Card[];
   player: Player;
 
   constructor(private boardService: BoardService,
               private playerService: PlayerService,
+              private cardHistoryService: CardHistoryService,
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
@@ -36,35 +40,28 @@ export class PlayerBoardComponent {
               public dialog: MatDialog,
               private snackBar: MatSnackBar) {
     this.boardService.displayNavBar = false;
-    this.loadingService.loading = true;
-    
     this.cards = this.cardService.getCards();
     
     this.activatedRoute.params.subscribe(params => {
-      this.addPlayer(params['uid']);
-      let boardUid = params['uid'];
-      this.boardService.getBoard(boardUid)
+      this.boardService.get(params['uid'])
         .subscribe((board: Board) => {
-          //TODO try to split the card history into another collection
-          let show = false;
-          if(this.board && this.board.cardHistory.length < board.cardHistory.length) {
-            show = true;
-          }
           this.board = board;
-          show && this.showHistory(true);
-          !this.board.gameStarted && this.initializeBoard();
+          this.initializeBoard();
           this.loadingService.loading = false;
         });
+      this.cardHistoryService.get(params['uid'])
+        .subscribe((cards: Card[]) => {
+          this.cardHistory = cards;
+          this.player && this.showHistory(true);
+        });
+      this.initializePlayer(params['uid']);
     });
   }
 
-  addPlayer = (uid: string) => {
-    let player: Player = JSON.parse( localStorage.getItem('player') );
-    if (!player || player.boardUid !== uid) {
-      this.updateName();
-    } else {
-      this.player = player;
-    }
+  initializePlayer = (uid: string) => {
+    let player = JSON.parse( localStorage.getItem('player') );
+    !player || player.boardUid !== uid ?
+      this.updateName() : this.player = player;
   }
 
   updateName = () => {
@@ -75,17 +72,16 @@ export class PlayerBoardComponent {
         boardUid: this.board.uid,
         playerBoard: []
       }
-      this.shuffleBoard();
-      this.playerService.createPlayer(this.board.uid, this.player)
-        .then((data: DocumentReference) => {
-          this.player.uid = data.id;
+      this.playerService.postPLayers(this.board.uid, [this.player])
+        .then(() => {
           localStorage.setItem('player', JSON.stringify(this.player));
         });
+      this.shuffleBoard();
     });
   }
 
   initializeBoard = () => {
-    if(this.player) {
+    if(this.player && !this.board.gameStarted) {
       this.player.playerBoard.forEach(card => card.selected = false);
       localStorage.setItem('player', JSON.stringify(this.player));
     }
@@ -105,7 +101,7 @@ export class PlayerBoardComponent {
   }
 
   cardSelected = (card: Card) => {
-    let found = this.board.cardHistory.some(_card => _card.uid === card.uid);
+    let found = this.cardHistory.some(_card => _card.uid === card.uid);
     if (found) {
       if (!card.selected) {
         card.selected = true;
@@ -126,23 +122,32 @@ export class PlayerBoardComponent {
   gameWon = () => this.player.playerBoard
     .reduce((total, card) => total + (card.selected ? 1 : 0), 0) === this.player.playerBoard.length;
   
-    getWinners = () => this.board.winners.join(', ');
+  getWinners = () => this.board.winners.join(', ');
+
+  createCloudPlayer = () => {
+    this.loadingService.loading = true;
+    this.playerService.post(this.player.boardUid).then(
+      () =>  this.loadingService.loading = false,
+      error => alert(error)
+    )
+  }
 
   updateCloudBoard = () => {
     this.loadingService.loading = true;
-    this.boardService.update(this.board).then(
-      success =>  this.loadingService.loading = false,
-      error => console.log(error)
+    this.boardService.put(this.board).then(
+      () =>  this.loadingService.loading = false,
+      error => alert(error)
     );
   }
 
   showHistory = (lastCards: boolean = false) => {
-    let ref = this.bottomSheet.open(CardHistoryComponent, {
-      data: {
-        cardHistory: [...this.board.cardHistory],
-        lastCards
-      }
-    });
+    if (this.cardHistory.length > 0)
+      this.bottomSheet.open(CardHistoryComponent, {
+        data: {
+          cardHistory: [...this.cardHistory],
+          lastCards
+        }
+      });
   }
 
 }

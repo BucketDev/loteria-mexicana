@@ -13,22 +13,29 @@ export class PlayerService {
 
   constructor(private db: AngularFirestore) { }
 
-  createPlayer = (boardUid: string, player: Player): Promise<DocumentReference> => 
-    this.db.collection(this.collectionBoardName).doc(boardUid)
-      .collection(this.collectionName).add(player);
+  post = (boardUid: string): Promise<void> => 
+    this.db.collection(this.collectionName).doc(boardUid).set({
+      players: []
+    });
+  
+  postPLayers = (boardUid: string, players: Player[]): Promise<void> => 
+    this.db.collection(this.collectionName).doc(boardUid).set({ players });
 
-  getPlayers = (boardUid: string) => this.db.collection(this.collectionBoardName).doc(boardUid)
-    .collection(this.collectionName).snapshotChanges().pipe(map(data => {
+  get = (boardUid: string) => this.db.collection(this.collectionName).doc(boardUid)
+    .snapshotChanges().pipe(map(data => {
       let players: Player[] = [];
-      data.forEach((data) => {
-        let player = data.payload.doc.data();
-        players.push({
-          uid: data.payload.doc.id,
-          boardUid: player['boardUid'],
-          name: player['name'],
+      data.payload.data()['players'].forEach((_player) => {
+        let player: Player = {
+          uid: _player['uid'],
+          boardUid: _player['boardUid'],
+          name: _player['name'],
           playerBoard: []
-        });
+        };
+        players.push(player);
       });
       return players;
     }));
+
+  put = (boardUid: string, player: Player) =>
+    this.db.collection(this.collectionName)
 }

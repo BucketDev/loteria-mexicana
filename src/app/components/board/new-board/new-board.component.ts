@@ -5,6 +5,8 @@ import { BoardService } from 'src/app/providers/board.service';
 import { DocumentReference } from '@angular/fire/firestore';
 import { LoadingService } from 'src/app/providers/loading.service';
 import { Router } from '@angular/router';
+import { PlayerService } from 'src/app/providers/player.service';
+import { CardHistoryService } from 'src/app/providers/card-history.service';
 
 @Component({
   selector: 'app-new-board',
@@ -16,13 +18,14 @@ export class NewBoardComponent implements OnInit {
   board: Board;
 
   constructor(private boardService: BoardService,
+              private playerService: PlayerService,
+              private cardHistoryService: CardHistoryService,
               private loadingService: LoadingService,
               private router: Router) {
     this.boardService.displayNavBar = true;
     this.board = {
       name: '',
       hostName: '',
-      cardHistory: [],
       creationDate: new Date(),
       gameStarted: false,
       gameWon: false,
@@ -34,10 +37,15 @@ export class NewBoardComponent implements OnInit {
 
   createBoard = () => {
     this.loadingService.loading = true;
-    this.boardService.createBoard(this.board)
-      .then((data: DocumentReference) => {
+    this.boardService.post(this.board)
+      .then((board: DocumentReference) => {
+        this.board.uid = board.id;
+        return this.playerService.post(board.id);
+      }).then(() =>
+        this.cardHistoryService.post(this.board.uid)
+      ).then(() => {
         this.loadingService.loading = false;
-        this.router.navigate([`/board/${data.id}/host`])
+        this.router.navigate([`/board/${this.board.uid}/host`])
       });
   }
 

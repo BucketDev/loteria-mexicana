@@ -14,7 +14,7 @@
         <mat-toolbar-row *ngIf="players && players.length > 0" class="d-flex justify-content-between">
             <div>
                 <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
-                    <mat-chip color="primary" selected="true" *ngFor="let winner of board.winners"
+                    <mat-chip color="primary" selected="true" matBadge="board.winners.length"
                             [matTooltip]="getWinners()"
                             [matTooltipPosition]="'right'">
                         Ganadores</mat-chip>
@@ -37,32 +37,30 @@
     </mat-toolbar>
     <span *ngIf="!players || players.length === 0; else playersArrived" class="d-block py-5 h3 text-muted text-center">Esperando al primer jugador</span>
     <ng-template #playersArrived>
-        <div class="d-flex m-2">
-            <div class="col d-flex flex-column align-items-start">
-                <h6 class="m-0">En linea
-                    <span class="d-block badge badge-info">{{ players.length }}</span></h6>
-            </div>
-            <div class="col d-flex flex-column align-items-end">
-                <h6 *ngIf="board.gameStarted" class="m-0">Cartas
-                    <span class="d-block badge badge-info">{{ calculateRest() }}</span></h6>
-            </div>
+        <div class="d-flex m-3 justify-content-between">
+            <mat-chip-list [matBadge]="players.length">
+                <mat-chip color="accent" selected="true">En línea</mat-chip>
+            </mat-chip-list>
+            <mat-chip-list *ngIf="board.gameStarted">
+                <mat-chip color="accent" selected="true">Cartas {{ calculateRest() }}</mat-chip>
+            </mat-chip-list>
         </div>
         <div class="p-2">
             <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center">
-                <span class="d-flex justify-content-center align-items-center deck mat-elevation-z2 bg-light">
+                <span class="d-flex justify-content-center align-items-center deck bg-light">
                     Da clic en iniciar
                 </span>
             </div>
             <ng-template #gameStarted>
                 <div *ngIf="cards && playingCards">
                     <div *ngIf="playingCards.length === 0; else cardsLeft" class="d-flex flex-column align-items-center">
-                        <span class="d-flex justify-content-center align-items-center deck mat-elevation-z2 bg-light">
+                        <span class="d-flex justify-content-center align-items-center deck shadow-lg bg-light">
                             <img src="https://png.icons8.com/color/galo-de-barcelos/128" alt="mezclar">
                         </span>
                     </div>
                     <ng-template #cardsLeft>
-                        <div *ngIf="playingCards" class="d-flex flex-column align-items-center">
-                            <div class="deck mat-elevation-z2" matRipple (click)="nextCard()"
+                        <div *ngIf="playingCards" class="d-flex flex-column align-items-center m-3">
+                            <div class="deck shadow-lg" matRipple (click)="nextCard()"
                                 [style.background-image]="playingCards[playingCards.length - 1].url | uriStyleSanitizer">
                             </div>
                         </div>

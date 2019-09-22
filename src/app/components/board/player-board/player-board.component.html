@@ -7,7 +7,7 @@
                 </a>
                 <small> {{ board.name }}</small>
             </div>
-            <button mat-raised-button type="button" (click)="shuffleBoard()" [disabled]="board.gameStarted">
+            <button mat-mini-fab color="default" type="button" (click)="shuffleBoard()" [disabled]="board.gameStarted">
                 <img src="https://png.icons8.com/cotton/synchronize--v2/24" alt="mezclar">
             </button>
         </mat-toolbar-row>
@@ -17,7 +17,7 @@
             <ng-template #gameStarted>
                 <div *ngIf="board.gameWon; else gameInProgress">
                     <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
-                        <mat-chip color="primary" selected="true" *ngFor="let winner of board.winners"
+                        <mat-chip color="primary" selected="true" matBadge="board.winners.length"
                                 [matTooltip]="getWinners()"
                                 [matTooltipPosition]="'right'">
                             Ganadores</mat-chip>
@@ -32,7 +32,7 @@
         </mat-toolbar-row>
     </mat-toolbar>
     <div *ngIf="player" class="d-flex flex-column align-items-center">
-        <div class="board d-flex flex-wrap mat-elevation-z4 my-3">
+        <div class="board d-flex flex-wrap m-3 shadow-lg">
             <div *ngFor="let card of player.playerBoard" [ngClass]="{'selected': card.selected}"
                 class="card justify-content-center" matRipple (click)="cardSelected(card)"
                 [style.background-image]="card.url | uriStyleSanitizer">

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import 'hammerjs';
@@ -13,45 +13,55 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { SettingsBoardComponent } from '../settings-board/settings-board.component';
 import { Player } from 'src/app/models/player.interface';
 import { PlayerService } from 'src/app/providers/player.service';
+import { CardHistoryService } from 'src/app/providers/card-history.service';
 
 @Component({
   selector: 'app-host-board',
   templateUrl: './host-board.component.html',
   styleUrls: ['./host-board.component.css']
 })
-export class HostBoardComponent implements OnInit {
+export class HostBoardComponent {
 
   board: Board;
   players: Player[];
+  cardHistory: Card[];
+  
   cards: Card[];
   playingCards: Card[] = [];
 
   constructor(private boardService: BoardService,
               private playersService: PlayerService,
+              private cardHistoryService: CardHistoryService,
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
               private snackBar: MatSnackBar,
               private bottomSheet: MatBottomSheet) {
     this.boardService.displayNavBar = false;
-    this.loadingService.loading = true;
-    
+    this.cards = this.cardService.getCards();
+    this.playingCards = JSON.parse(localStorage.getItem('playingCards'));
+
     this.activatedRoute.params.subscribe(params => {
-      this.boardService.getBoard(params['uid'])
-        .subscribe((board: Board) => {
-          this.board = board;
-          this.initializeDeck();
-          this.loadingService.loading = false;
-        });
-      this.playersService.getPlayers(params['uid']).subscribe((players: Player[]) => this.players = players);
+      this.boardService.get(params['uid']).subscribe((board: Board) => this.board = board);
+      this.playersService.get(params['uid']).subscribe((players: Player[]) => this.players = players);
+      this.cardHistoryService.get(params['uid']).subscribe((cards: Card[]) => this.cardHistory = cards);
     });
   }
 
-  initializeDeck = () => {
-    this.cards = this.cardService.getCards();
-    if (this.board.gameStarted) {
-      this.playingCards = JSON.parse(localStorage.getItem('playingCards'));
-    }
+  updateCloudBoard = () => {
+    this.loadingService.loading = true;
+    this.boardService.put(this.board).then(
+      () =>  this.loadingService.loading = false,
+      error => alert(error)
+    );
+  }
+
+  updateCloudCardHistory = () => {
+    this.loadingService.loading = true;
+    this.cardHistoryService.put(this.board.uid, this.cardHistory).then(
+      () =>  this.loadingService.loading = false,
+      error => alert(error)
+    );
   }
 
   startGame = () => {
@@ -59,30 +69,31 @@ export class HostBoardComponent implements OnInit {
     this.shuffleDeck();
     this.board.gameStarted = true;
     this.board.gameWon = false;
-    this.board.cardHistory = [this.playingCards[this.playingCards.length -1]];
     this.updateCloudBoard();
+    this.cardHistory = [this.playingCards[this.playingCards.length -1]];
+    this.updateCloudCardHistory();
   }
 
   nextCard = () => {
     this.playingCards.pop();
     localStorage.setItem('playingCards', JSON.stringify(this.playingCards));
     if (this.playingCards.length > 0) {
-      this.board.cardHistory.push(this.playingCards[this.playingCards.length - 1]);
-      this.updateCloudBoard();
+      this.cardHistory.push(this.playingCards[this.playingCards.length - 1]);
+      this.updateCloudCardHistory();
     }
   }
   
   finishGame = () => {
     this.board.gameStarted = false;
     this.board.winners = [];
-    this.board.cardHistory = [];
     this.updateCloudBoard();
+    this.cardHistory = [];
+    this.updateCloudCardHistory();
   }
 
   shuffleDeck = () => {
     let array = this.playingCards;
-    let length = this.board.gameStarted ? array.length - 2 : array.length - 1
-    for (let i = length; i > 0; i--) {
+    for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
@@ -92,19 +103,9 @@ export class HostBoardComponent implements OnInit {
     });
   }
 
-  updateCloudBoard = () => {
-    this.loadingService.loading = true;
-    this.boardService.update(this.board).then(
-      success =>  this.loadingService.loading = false,
-      error => console.log(error)
-    );
-  }
-
   calculateRest = () => `${this.playingCards.length}/${this.cards.length}`;
 
   getWinners = () => this.board.winners.join(', ')
-
-  ngOnInit() { }
 
   copyAndShare = () => {
     let url = `${environment.endpointURL}/board/${this.board.uid}/player`;
