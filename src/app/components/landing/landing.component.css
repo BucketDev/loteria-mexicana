@@ -1,0 +1,7 @@
+.landing-card {
+    height: 180px;
+    width: 115px;
+    min-width: 115px;
+    background-position: center;
+    background-size: cover;
+}

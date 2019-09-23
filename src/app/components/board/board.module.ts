@@ -7,12 +7,12 @@ import { RouterModule } from '@angular/router';
 import { HostBoardComponent } from './host-board/host-board.component';
 import { PlayerBoardComponent } from './player-board/player-board.component';
 import { MaterialModule } from 'src/app/material/material.module';
-import { UriStyleSanitizerPipe } from 'src/app/pipes/uri-style-sanitizer.pipe';
 import { SettingsBoardComponent } from './settings-board/settings-board.component';
 import { CardHistoryComponent } from './player-board/card-history.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PlayerNameComponent } from './player-board/player-name.component';
 import { SharedModule } from '../shared/shared.module';
+import { SharedPipeModule } from 'src/app/pipes/shared-pipe.module';
 
 @NgModule({
   imports: [
@@ -21,13 +21,13 @@ import { SharedModule } from '../shared/shared.module';
     RouterModule,
     MaterialModule,
     MatProgressBarModule,
-    SharedModule
+    SharedModule,
+    SharedPipeModule
   ],
   declarations: [
     NewBoardComponent,
     HostBoardComponent,
     PlayerBoardComponent,
-    UriStyleSanitizerPipe,
     SettingsBoardComponent,
     CardHistoryComponent,
     PlayerNameComponent

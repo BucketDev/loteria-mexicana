@@ -1,10 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Dosis&display=swap');
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 
 * {
-font-family: 'Lato', sans-serif;
+font-family: 'Dosis', sans-serif;
 }
   
 button:focus {
     outline:0 !important;
+}
+
+/* Animations */
+.animated {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.fast {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation-name: fadeIn;
 }

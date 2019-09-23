@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BoardService } from 'src/app/providers/board.service';
+import { Card } from 'src/app/models/card.interface';
+import { CardService } from 'src/app/providers/card.service';
 
 @Component({
   selector: 'app-landing',
@@ -8,8 +10,12 @@ import { BoardService } from 'src/app/providers/board.service';
 })
 export class LandingComponent implements OnInit {
 
-  constructor(private boardService: BoardService) {
+  card: Card;
+
+  constructor(private boardService: BoardService,
+              private cardService: CardService) {
     this.boardService.displayNavBar = true;
+    this.card = this.cardService.getCards()[Math.floor(Math.random() * (54 + 1))];
   }
 
   ngOnInit() {
