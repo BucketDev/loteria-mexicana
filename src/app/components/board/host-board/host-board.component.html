@@ -41,8 +41,9 @@
                 <mat-chip color="accent" selected="true">Cartas {{ calculateRest() }}</mat-chip>
             </mat-chip-list>
         </div>
-        <div class="p-2">
-            <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center">
+        <div class="d-flex justify-content-center">
+            <app-chat></app-chat>
+            <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center ml-2">
                 <span class="d-flex justify-content-center align-items-center deck bg-light">
                     Da clic en iniciar
                     <button *ngIf="!board.gameStarted" mat-mini-fab color="default" type="button" class="ml-2"
@@ -52,14 +53,14 @@
                 </span>
             </div>
             <ng-template #gameStarted>
-                <div *ngIf="cards && playingCards">
+                <div *ngIf="cards && playingCards" class="ml-2">
                     <div *ngIf="playingCards.length === 0; else cardsLeft" class="d-flex flex-column align-items-center">
                         <span class="d-flex justify-content-center align-items-center deck shadow-lg bg-light">
                             <img src="https://png.icons8.com/color/galo-de-barcelos/128" alt="mezclar">
                         </span>
                     </div>
                     <ng-template #cardsLeft>
-                        <div *ngIf="playingCards" class="d-flex flex-column align-items-center m-3">
+                        <div *ngIf="playingCards" class="d-flex flex-column align-items-center">
                             <div class="deck shadow-lg" matRipple (click)="nextCard()"
                                 [style.background-image]="playingCards[playingCards.length - 1].url | uriStyleSanitizer">
                             </div>

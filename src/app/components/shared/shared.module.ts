@@ -7,22 +7,25 @@ import { MaterialModule } from 'src/app/material/material.module';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { LoadingComponent } from './loading/loading.component';
 import { RouterModule } from '@angular/router';
+import { ChatComponent } from './chat/chat.component';
 
 
 @NgModule({
-  declarations: [
-    NavBarComponent,
-    LoadingComponent
-  ],
   imports: [
     CommonModule,
     RouterModule,
     MaterialModule,
     MatProgressBarModule
   ],
+  declarations: [
+    NavBarComponent,
+    LoadingComponent,
+    ChatComponent
+  ],
   exports: [
     NavBarComponent,
-    LoadingComponent
+    LoadingComponent,
+    ChatComponent
   ]
 })
 export class SharedModule { }

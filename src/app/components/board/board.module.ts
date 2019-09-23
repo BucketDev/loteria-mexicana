@@ -12,6 +12,7 @@ import { SettingsBoardComponent } from './settings-board/settings-board.componen
 import { CardHistoryComponent } from './player-board/card-history.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PlayerNameComponent } from './player-board/player-name.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { PlayerNameComponent } from './player-board/player-name.component';
     FormsModule,
     RouterModule,
     MaterialModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    SharedModule
   ],
   declarations: [
     NewBoardComponent,

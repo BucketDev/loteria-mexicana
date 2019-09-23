@@ -39,8 +39,9 @@
             </div>
         </mat-toolbar-row>
     </mat-toolbar>
-    <div *ngIf="player" class="d-flex flex-column align-items-center">
-        <div class="board d-flex flex-wrap m-3 shadow-lg">
+    <div *ngIf="player" class="d-flex justify-content-center p-3">
+        <app-chat></app-chat>
+        <div class="board d-flex flex-wrap shadow-lg ml-2">
             <div *ngFor="let card of player.playerBoard" [ngClass]="{'selected': card.selected}"
                 class="card justify-content-center" matRipple (click)="cardSelected(card)"
                 [style.background-image]="card.url | uriStyleSanitizer">
