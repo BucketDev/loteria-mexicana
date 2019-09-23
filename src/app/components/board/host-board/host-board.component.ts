@@ -105,14 +105,18 @@ export class HostBoardComponent {
 
   calculateRest = () => `${this.playingCards.length}/${this.cards.length}`;
 
-  getWinners = () => this.board.winners.join(', ')
+  getWinners = () => this.board.winners.join(', ');
+  
+  getPlayers = () => this.players.map((player: Player) => player.name).join(', ');
+
+  canShare = () => window.navigator && window.navigator['share'];
 
   copyAndShare = () => {
     let url = `${environment.endpointURL}/board/${this.board.uid}/player`;
     let _this = this;
-    if (window.navigator && window.navigator['share']) {
+    if ( this.canShare() ) {
       window.navigator['share']({
-        title: 'WebShare API Demo',
+        title: 'Comparte lotería mexicana con tus amigos y familia',
         url
       }).then(() => {
         console.log('Thanks for sharing!');

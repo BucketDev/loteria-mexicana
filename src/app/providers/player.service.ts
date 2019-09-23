@@ -19,14 +19,13 @@ export class PlayerService {
     });
   
   postPLayers = (boardUid: string, players: Player[]): Promise<void> => 
-    this.db.collection(this.collectionName).doc(boardUid).set({ players });
+    this.db.collection(this.collectionName).doc(boardUid).set({players});
 
   get = (boardUid: string) => this.db.collection(this.collectionName).doc(boardUid)
     .snapshotChanges().pipe(map(data => {
       let players: Player[] = [];
       data.payload.data()['players'].forEach((_player) => {
         let player: Player = {
-          uid: _player['uid'],
           boardUid: _player['boardUid'],
           name: _player['name'],
           playerBoard: []

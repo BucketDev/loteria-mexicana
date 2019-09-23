@@ -26,6 +26,7 @@ export class PlayerBoardComponent {
 
   board: Board;
   cardHistory: Card[];
+  players: Player[];
 
   cards: Card[];
   player: Player;
@@ -54,6 +55,7 @@ export class PlayerBoardComponent {
           this.cardHistory = cards;
           this.player && this.showHistory(true);
         });
+      this.playerService.get(params['uid']).subscribe((players: Player[]) => this.players = players)
       this.initializePlayer(params['uid']);
     });
   }
@@ -61,10 +63,10 @@ export class PlayerBoardComponent {
   initializePlayer = (uid: string) => {
     let player = JSON.parse( localStorage.getItem('player') );
     !player || player.boardUid !== uid ?
-      this.updateName() : this.player = player;
+      this.createPlayer() : this.player = player;
   }
 
-  updateName = () => {
+  createPlayer = () => {
     const dialogRef = this.dialog.open(PlayerNameComponent, { disableClose: true, data: { name: '' } });
     dialogRef.afterClosed().subscribe(result => {
       this.player = {
@@ -72,11 +74,28 @@ export class PlayerBoardComponent {
         boardUid: this.board.uid,
         playerBoard: []
       }
-      this.playerService.postPLayers(this.board.uid, [this.player])
+      this.players.push(this.player);
+      this.playerService.postPLayers(this.board.uid, this.players)
         .then(() => {
           localStorage.setItem('player', JSON.stringify(this.player));
         });
       this.shuffleBoard();
+    });
+  }
+
+  updateName = () => {
+    const dialogRef = this.dialog.open(PlayerNameComponent, { disableClose: true, data: { name: this.player.name } });
+    dialogRef.afterClosed().subscribe(result => {
+      this.players.forEach((_player: Player) => {
+        if (this.player.name === _player.name)
+          _player.name = result;
+      });
+      this.player.name = result;
+      this.playerService.postPLayers(this.board.uid, this.players)
+        .then(
+          () => localStorage.setItem('player', JSON.stringify(this.player)),
+          (error) => alert(console.error())
+        );
     });
   }
 

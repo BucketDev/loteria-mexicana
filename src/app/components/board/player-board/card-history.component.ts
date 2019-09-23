@@ -13,7 +13,7 @@ export class CardHistoryComponent implements OnInit {
   cardHistory: Card[];
   progressbarValue = 0;
   curSec: number = 0;
-  timeLapse: number = 3;
+  timeLapse: number = 2;
 
   constructor(private bottomSheetRef: MatBottomSheetRef<CardHistoryComponent>,
               private _changeDetectorRef: ChangeDetectorRef,
@@ -25,6 +25,7 @@ export class CardHistoryComponent implements OnInit {
     bottomSheetRef.afterOpened().subscribe(() =>
       document.querySelector('.card-history-container').scrollLeft = this.cardHistory.length * (110 - 50))
     data.lastCards && this.startTimer();
+    data.lastCards && new Audio(`assets/sounds/${this.cardHistory[this.cardHistory.length - 1].uid}.mp3`).play();
   }
 
   startTimer() {

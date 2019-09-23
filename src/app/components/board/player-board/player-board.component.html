@@ -1,34 +1,42 @@
 <div *ngIf="board">
     <mat-toolbar color="accent">
-        <mat-toolbar-row class="d-flex justify-content-between mat-elevation-z4">
+        <mat-toolbar-row *ngIf="!board.gameStarted" class="d-flex justify-content-between mat-elevation-z4">
             <div class="text-truncate">
                 <a href="#" [routerLink]="['/']">
                     <img src="https://png.icons8.com/cotton/watermelon--v1/32" alt="logo" class="pb-2">
                 </a>
                 <small> {{ board.name }}</small>
             </div>
-            <button mat-mini-fab color="default" type="button" (click)="shuffleBoard()" [disabled]="board.gameStarted">
+            <button mat-mini-fab color="default" type="button" (click)="shuffleBoard()"
+                    matTooltip="Crea otro tablero" matTooltipPosition="before"
+                    [disabled]="board.gameStarted">
                 <img src="https://png.icons8.com/cotton/synchronize--v2/24" alt="mezclar">
             </button>
         </mat-toolbar-row>
-        <mat-toolbar-row class="d-flex justify-content-between"
-            color="primary">
-            <span *ngIf="!board.gameStarted; else gameStarted">Por iniciar</span>
-            <ng-template #gameStarted>
-                <div *ngIf="board.gameWon; else gameInProgress">
-                    <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
-                        <mat-chip color="primary" selected="true" matBadge="board.winners.length"
-                                [matTooltip]="getWinners()"
-                                [matTooltipPosition]="'right'">
-                            Ganadores</mat-chip>
-                    </mat-chip-list>
-                </div>
-                <ng-template #gameInProgress><span>Juego Iniciado</span></ng-template>
-            </ng-template>
-            <button mat-mini-fab color="default" (click)="showHistory()"
-                    [disabled]="!board.gameStarted">
-                <img src="https://png.icons8.com/color/product-documents/24" alt="configuracion">
-            </button>
+        <mat-toolbar-row *ngIf="player" class="d-flex justify-content-between" color="primary">
+            <button mat-flat-button (click)="updateName()">{{ player.name }}</button>
+            <div *ngIf="board.gameWon">
+                <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
+                    <mat-chip color="primary" selected="true"
+                            [matTooltip]="getWinners()"
+                            matTooltipPosition="below">
+                        Ganadores</mat-chip>
+                </mat-chip-list>
+            </div>
+            <div>
+                <button *ngIf="!board.gameStarted; else gameInProgress" mat-mini-fab color="default" matTooltip="En espera">
+                    <img src="https://png.icons8.com/color/hourglass-sand-bottom/24" alt="Por iniciar">
+                </button>
+                <ng-template #gameInProgress>
+                    <button mat-mini-fab color="default" matTooltip="Juego en progreso" matTooltipPosition="before">
+                        <img src="https://png.icons8.com/color/in-progress--v1/24" alt="Iniciado">
+                    </button>
+                </ng-template>
+                <button mat-mini-fab color="default" (click)="showHistory()" class="ml-2"
+                        [disabled]="!board.gameStarted">
+                    <img src="https://png.icons8.com/color/product-documents/24" alt="historial de cartas">
+                </button>
+            </div>
         </mat-toolbar-row>
     </mat-toolbar>
     <div *ngIf="player" class="d-flex flex-column align-items-center">

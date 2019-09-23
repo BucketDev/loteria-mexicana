@@ -8,23 +8,19 @@
                 <small> {{ board.name }}</small>
             </div>
             <button mat-mini-fab color="default" (click)="copyAndShare()">
-                <img src="https://png.icons8.com/cotton/copy/24" alt="copiar">
+                <img *ngIf="!canShare()" src="https://png.icons8.com/cotton/copy/24" alt="copiar">
+                <img *ngIf="canShare()" src="https://png.icons8.com/color/share-3/24" alt="copiar">
             </button>
         </mat-toolbar-row>
         <mat-toolbar-row *ngIf="players && players.length > 0" class="d-flex justify-content-between">
             <div>
                 <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
-                    <mat-chip color="primary" selected="true" matBadge="board.winners.length"
-                            [matTooltip]="getWinners()"
-                            [matTooltipPosition]="'right'">
+                    <mat-chip color="primary" selected="true"
+                            [matTooltip]="getWinners()" matTooltipPosition="right">
                         Ganadores</mat-chip>
                 </mat-chip-list>
             </div>
             <div>
-                <button *ngIf="!board.gameStarted" mat-mini-fab color="default" type="button" class="ml-2"
-                        (click)="startGame()">
-                    <img src="https://png.icons8.com/color/start/24" alt="configuracion">
-                </button>
                 <button *ngIf="board.gameStarted" mat-mini-fab color="default" type="button" class="ml-2"
                         (click)="finishGame()" [disabled]="!board.gameWon && playingCards.length > 0">
                     <img src="https://png.icons8.com/color/stop-squared/24" alt="configuracion">
@@ -38,7 +34,7 @@
     <span *ngIf="!players || players.length === 0; else playersArrived" class="d-block py-5 h3 text-muted text-center">Esperando al primer jugador</span>
     <ng-template #playersArrived>
         <div class="d-flex m-3 justify-content-between">
-            <mat-chip-list [matBadge]="players.length">
+            <mat-chip-list [matBadge]="players.length" [matTooltip]="getPlayers()">
                 <mat-chip color="accent" selected="true">En línea</mat-chip>
             </mat-chip-list>
             <mat-chip-list *ngIf="board.gameStarted">
@@ -49,6 +45,10 @@
             <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center">
                 <span class="d-flex justify-content-center align-items-center deck bg-light">
                     Da clic en iniciar
+                    <button *ngIf="!board.gameStarted" mat-mini-fab color="default" type="button" class="ml-2"
+                            (click)="startGame()">
+                        <img src="https://png.icons8.com/color/start/24" alt="configuracion">
+                    </button>
                 </span>
             </div>
             <ng-template #gameStarted>
