@@ -7,31 +7,34 @@
                 </a>
                 <small> {{ board.name }}</small>
             </div>
-            <button mat-mini-fab color="default" type="button" (click)="shuffleBoard()"
-                    matTooltip="Crea otro tablero" matTooltipPosition="before"
-                    [disabled]="board.gameStarted">
-                <img src="https://png.icons8.com/cotton/synchronize--v2/24" alt="mezclar">
-            </button>
+            <div>
+                <button *ngIf="player" mat-flat-button (click)="updateName()">{{ player.name }}</button>
+                <button mat-mini-fab color="default" type="button" (click)="shuffleBoard()"
+                        matTooltip="Crea otro tablero" matTooltipPosition="before"
+                        [disabled]="board.gameStarted" class="ml-2">
+                    <img src="https://png.icons8.com/cotton/synchronize--v2/24" alt="mezclar">
+                </button>
+            </div>
         </mat-toolbar-row>
         <mat-toolbar-row *ngIf="player" class="d-flex justify-content-between" color="primary">
-            <button mat-flat-button (click)="updateName()">{{ player.name }}</button>
-            <div *ngIf="board.gameWon">
-                <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
-                    <mat-chip color="primary" selected="true"
-                            [matTooltip]="getWinners()"
-                            matTooltipPosition="below">
-                        Ganadores</mat-chip>
-                </mat-chip-list>
-            </div>
-            <div>
-                <button *ngIf="!board.gameStarted; else gameInProgress" mat-mini-fab color="default" matTooltip="En espera">
-                    <img src="https://png.icons8.com/color/hourglass-sand-bottom/24" alt="Por iniciar">
-                </button>
-                <ng-template #gameInProgress>
-                    <button mat-mini-fab color="default" matTooltip="Juego en progreso" matTooltipPosition="before">
+            <mat-chip-list>
+                <mat-chip  *ngIf="board.gameWon && board.gameStarted"
+                        color="primary" selected="true"
+                        [matTooltip]="getWinners()"
+                        matTooltipPosition="below">
+                    Ganadores</mat-chip>
+            </mat-chip-list>
+            <div class="d-flex align-items-center">
+                <mat-chip-list>
+                    <mat-chip *ngIf="!board.gameStarted" color="warn" selected>
+                        <img src="https://png.icons8.com/color/hourglass-sand-bottom/24" alt="Por iniciar">
+                        <span class="ml-1">Por iniciar</span>
+                    </mat-chip>
+                    <mat-chip *ngIf="board.gameStarted" color="primary" selected>
                         <img src="https://png.icons8.com/color/in-progress--v1/24" alt="Iniciado">
-                    </button>
-                </ng-template>
+                        <span class="ml-1">Juego iniciado</span>
+                    </mat-chip>
+                </mat-chip-list>
                 <button mat-mini-fab color="default" (click)="showHistory()" class="ml-2"
                         [disabled]="!board.gameStarted">
                     <img src="https://png.icons8.com/color/product-documents/24" alt="historial de cartas">
@@ -40,7 +43,7 @@
         </mat-toolbar-row>
     </mat-toolbar>
     <div *ngIf="player" class="d-flex justify-content-center pt-2">
-        <div class="board d-flex flex-wrap shadow-lg p-2 ml-2 justify-content-between align-items-center rounded border bg-light">
+        <div class="board d-flex flex-wrap shadow-lg p-2 justify-content-between align-items-center rounded border bg-light">
             <div *ngFor="let card of player.playerBoard" [ngClass]="{'selected': card.selected}"
                 class="card justify-content-center border border-dark" matRipple (click)="cardSelected(card)"
                 [style.background-image]="card.url | uriStyleSanitizer">

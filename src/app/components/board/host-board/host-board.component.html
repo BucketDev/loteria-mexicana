@@ -7,71 +7,110 @@
                 </a>
                 <small> {{ board.name }}</small>
             </div>
-            <button mat-mini-fab color="default" (click)="copyAndShare()">
-                <img *ngIf="!canShare()" src="https://png.icons8.com/cotton/copy/24" alt="copiar">
-                <img *ngIf="canShare()" src="https://png.icons8.com/color/share-3/24" alt="copiar">
-            </button>
-        </mat-toolbar-row>
-        <mat-toolbar-row *ngIf="players && players.length > 0" class="d-flex justify-content-between">
+            <mat-chip-list *ngIf="board.gameWon && board.gameStarted && !autoPilot">
+                <mat-chip color="primary" selected="true"
+                        [matTooltip]="getWinners()" matTooltipPosition="below">
+                    Ganadores</mat-chip>
+            </mat-chip-list>
             <div>
-                <mat-chip-list *ngIf="board.gameWon && board.gameStarted">
-                    <mat-chip color="primary" selected="true"
-                            [matTooltip]="getWinners()" matTooltipPosition="right">
-                        Ganadores</mat-chip>
-                </mat-chip-list>
-            </div>
-            <div>
-                <button *ngIf="board.gameStarted" mat-mini-fab color="default" type="button" class="ml-2"
-                        (click)="finishGame()" [disabled]="!board.gameWon && playingCards.length > 0">
-                    <img src="https://png.icons8.com/color/stop-squared/24" alt="configuracion">
+                <button mat-mini-fab color="default" [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                    <img src="https://png.icons8.com/color/menu-2/24" alt="menu">
                 </button>
-                <button mat-mini-fab color="default" (click)="openSettings()" class="ml-2">
-                    <img src="https://png.icons8.com/cotton/wrench--v2/24" alt="configuracion">
-                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="copyAndShare()">
+                        <div *ngIf="!canShare()">
+                            <img src="https://png.icons8.com/cotton/copy/24" alt="copiar">
+                            <span class="ml-2">Copiar</span>
+                        </div>
+                        <div *ngIf="canShare()">
+                            <img src="https://png.icons8.com/color/share-3/24" alt="copiar">
+                            <span>Compartir</span>
+                        </div>
+                    </button>
+                    <button *ngIf="!board.gameStarted" mat-menu-item (click)="openSettings()" disabled>
+                        <img src="https://png.icons8.com/cotton/wrench--v2/24" alt="configuracion">
+                        <span class="ml-2">Configuración</span>
+                    </button>
+                    <button *ngIf="!board.gameStarted" mat-menu-item (click)="startGame()">
+                        <img src="https://png.icons8.com/color/start/24" alt="comenzar">
+                        <span class="ml-2">Comenzar</span>
+                    </button>
+                    <button *ngIf="board.gameStarted" mat-menu-item
+                            (click)="finishGame()" [disabled]="!board.gameWon && playingCards.length > 0">
+                        <img src="https://png.icons8.com/color/stop-squared/24" alt="terminar">
+                        <span class="ml-2">Terminar</span>
+                    </button>
+                    <button *ngIf="!players || !board.gameStarted" mat-menu-item (click)="enableAutoPilot()">
+                        <img src="https://png.icons8.com/color/air-pilot-hat/24" alt="terminar">
+                        <span class="ml-2">Automático</span>
+                    </button>
+                </mat-menu>
             </div>
         </mat-toolbar-row>
     </mat-toolbar>
     <div *ngIf="!players || players.length === 0; else playersArrived" class="d-flex justify-content-center mt-5">
-        <div class="d-flex flex-column justify-content-around p-3 bg-light text-muted text-center deck mat-elevation-z1">
-            <span class="h3"><strong>Esperando al primer jugador</strong></span>
-            <span class="h5">Da clic en el botón de compartir</span>
+        <div class="d-flex flex-column justify-content-around p-3 bg-light text-muted text-center deck mat-elevation-z4 border border-secondary rounded">
+            <span class="h3"><strong>Esperando a otro jugador</strong></span>
+            <span *ngIf="!canShare()" class="h5">Da clic en<br>
+                <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
+                <strong>menu >
+                <img src="https://png.icons8.com/cotton/copy/16" alt="menu"> copiar</strong><br>para enviar un enlace a tus amigos
+            </span>
+            <span *ngIf="canShare()" class="h5">Da clic en <br>
+                <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
+                <strong>menu > 
+                <img src="https://png.icons8.com/color/share-3/24" alt="copiar"> compartir</strong><br>para invitar a tus amigos</span>
         </div>
     </div>
     <ng-template #playersArrived>
-        <div class="d-flex m-3 justify-content-between">
-            <mat-chip-list [matBadge]="players.length" [matTooltip]="getPlayers()">
-                <mat-chip color="accent" selected="true">En línea</mat-chip>
-            </mat-chip-list>
-            <mat-chip-list *ngIf="board.gameStarted">
-                <mat-chip color="accent" selected="true">Cartas {{ calculateRest() }}</mat-chip>
-            </mat-chip-list>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center ml-2">
-                <span class="d-flex justify-content-center align-items-center deck bg-light">
-                    Da clic en iniciar
-                    <button *ngIf="!board.gameStarted" mat-mini-fab color="default" type="button" class="ml-2"
-                            (click)="startGame()">
-                        <img src="https://png.icons8.com/color/start/24" alt="configuracion">
-                    </button>
-                </span>
+        <div *ngIf="!autoPilot; else playOnHost" class="animated fadeIn p-4">
+            <div class="d-flex justify-content-between">
+                <mat-chip-list [matBadge]="players.length" [matTooltip]="getPlayers()">
+                    <mat-chip color="accent" selected="true">Jugadores</mat-chip>
+                </mat-chip-list>
+                <mat-chip-list *ngIf="board.gameStarted">
+                    <mat-chip color="accent" selected="true">Cartas {{ calculateRest() }}</mat-chip>
+                </mat-chip-list>
             </div>
-            <ng-template #gameStarted>
-                <div *ngIf="cards && playingCards" class="ml-2">
-                    <div *ngIf="playingCards.length === 0; else cardsLeft" class="d-flex flex-column align-items-center">
-                        <span class="d-flex justify-content-center align-items-center deck shadow-lg bg-light border border-dark rounded">
-                            <img src="https://png.icons8.com/color/galo-de-barcelos/128" alt="mezclar">
+            <div class="d-flex justify-content-center">
+                <div *ngIf="!board.gameStarted; else gameStarted" class="d-flex flex-column align-items-center">
+                    <div class="d-flex flex-column justify-content-around p-3 bg-light text-muted text-center deck mat-elevation-z1 border border-secondary rounded">
+                        <span class="h5">Da clic en <br>
+                            <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
+                            <strong>menu >
+                            <img src="https://png.icons8.com/color/start/16" alt="comenzar"> comenzar</strong><br> para comenzar a repartir las cartas
+                        </span>
+                        <span class="h3 border-top border-bottom border-dark p-2">&gt; O también &lt;</span>
+                        <span class="h5">Da clic en <br>
+                            <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
+                            <strong>menu >
+                            <img src="https://png.icons8.com/color/air-pilot-hat/24" alt="terminar"> automático</strong><br> para repartir las cartas de manera automática
                         </span>
                     </div>
-                    <ng-template #cardsLeft>
-                        <div *ngIf="playingCards" class="d-flex flex-column align-items-center">
-                            <div class="deck shadow-lg border border-dark rounded" matRipple (click)="nextCard()"
-                                [style.background-image]="playingCards[playingCards.length - 1].url | uriStyleSanitizer">
+                </div>
+                <ng-template #gameStarted>
+                    <div *ngIf="cards && playingCards">
+                        <div *ngIf="playingCards.length === 0; else cardsLeft" class="d-flex flex-column align-items-center">
+                            <div class="d-flex flex-column justify-content-around p-3 bg-light text-muted text-center deck mat-elevation-z1 border border-secondary rounded">
+                                <span class="h5">Da clic en <br>
+                                    <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
+                                    <strong>menu >
+                                    <img src="https://png.icons8.com/color/stop-squared/24" alt="terminar"> terminar</strong><br> para finalizar el juego</span>
                             </div>
                         </div>
-                    </ng-template>
-                </div>
-            </ng-template>
+                        <ng-template #cardsLeft>
+                            <div *ngIf="playingCards" class="d-flex flex-column align-items-center">
+                                <div class="deck shadow-lg border border-dark rounded" matRipple (click)="nextCard()"
+                                    [style.background-image]="playingCards[playingCards.length - 1].url | uriStyleSanitizer">
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                </ng-template>
+            </div>
         </div>
+        <ng-template #playOnHost>
+            <app-player-board [board]="board" [players]="players"></app-player-board>
+        </ng-template>
     </ng-template>
 </div>

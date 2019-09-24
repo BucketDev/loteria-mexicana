@@ -8,9 +8,9 @@ import { HostBoardComponent } from './host-board/host-board.component';
 import { PlayerBoardComponent } from './player-board/player-board.component';
 import { MaterialModule } from 'src/app/material/material.module';
 import { SettingsBoardComponent } from './settings-board/settings-board.component';
-import { CardHistoryComponent } from './player-board/card-history.component';
+import { CardHistoryComponent } from './player-board/card-history/card-history.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { PlayerNameComponent } from './player-board/player-name.component';
+import { PlayerNameComponent } from './player-board/player-name/player-name.component';
 import { SharedModule } from '../shared/shared.module';
 import { SharedPipeModule } from 'src/app/pipes/shared-pipe.module';
 

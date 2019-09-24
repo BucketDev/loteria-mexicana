@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import 'hammerjs';
@@ -14,6 +14,8 @@ import { SettingsBoardComponent } from '../settings-board/settings-board.compone
 import { Player } from 'src/app/models/player.interface';
 import { PlayerService } from 'src/app/providers/player.service';
 import { CardHistoryService } from 'src/app/providers/card-history.service';
+import { interval } from 'rxjs';
+import { PlayerBoardComponent } from '../player-board/player-board.component';
 
 @Component({
   selector: 'app-host-board',
@@ -28,6 +30,10 @@ export class HostBoardComponent {
   
   cards: Card[];
   playingCards: Card[] = [];
+
+  @ViewChild(PlayerBoardComponent, { static: false }) playerBoard: PlayerBoardComponent;
+  autoPilot: boolean = false;
+  timeLapse: number = 3;
 
   constructor(private boardService: BoardService,
               private playersService: PlayerService,
@@ -44,7 +50,6 @@ export class HostBoardComponent {
     this.activatedRoute.params.subscribe(params => {
       this.boardService.get(params['uid']).subscribe((board: Board) => this.board = board);
       this.playersService.get(params['uid']).subscribe((players: Player[]) => this.players = players);
-      this.cardHistoryService.get(params['uid']).subscribe((cards: Card[]) => this.cardHistory = cards);
     });
   }
 
@@ -91,6 +96,20 @@ export class HostBoardComponent {
     this.board.winners = [];
     this.updateCloudBoard();
     this.cardHistoryService.delete(this.board.uid);
+    this.autoPilot = false;
+  }
+
+  enableAutoPilot = () => {
+    this.autoPilot = true;
+    this.startGame();
+    const timer$ = interval(1000);
+    const sub = timer$.subscribe((sec) => {
+      if (sec > 0 && sec % this.timeLapse === 0) {
+        this.nextCard();
+        if (this.playingCards.length === 0)
+          sub.unsubscribe();
+      }
+    });
   }
 
   shuffleDeck = () => {
@@ -124,12 +143,16 @@ export class HostBoardComponent {
         console.log('Thanks for sharing!');
       }).catch(console.error);
     } else {
-      navigator.clipboard.writeText(url).then(function() {
-        _this.snackBar.open('Se copió el enlace con éxito', '', {
-          duration: 3000,
-        });
-      }, function(err) {
-        console.error('Async: Could not copy text: ', err);
+      var dummy = document.createElement("input");
+      document.body.appendChild(dummy);
+      dummy.setAttribute("id", "dummy_id");
+      (<HTMLInputElement> document.getElementById("dummy_id")).value = url;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+
+      _this.snackBar.open('Se copió el enlace con éxito', '', {
+        duration: 3000,
       });
     }
   }

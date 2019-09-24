@@ -7,6 +7,7 @@ import { LoadingService } from 'src/app/providers/loading.service';
 import { Router } from '@angular/router';
 import { PlayerService } from 'src/app/providers/player.service';
 import { CardHistoryService } from 'src/app/providers/card-history.service';
+import { Player } from 'src/app/models/player.interface';
 
 @Component({
   selector: 'app-new-board',
@@ -40,6 +41,8 @@ export class NewBoardComponent implements OnInit {
     this.boardService.post(this.board)
       .then((board: DocumentReference) => {
         this.board.uid = board.id;
+        let player: Player = { name: this.board.hostName, boardUid: board.id }
+        localStorage.setItem('player', JSON.stringify(player));
         this.loadingService.loading = false;
         this.router.navigate([`/board/${this.board.uid}/host`])
       });

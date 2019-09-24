@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentReference } from '@angular/fire/firestore';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -10,10 +11,10 @@ import { CardService } from 'src/app/providers/card.service';
 import { Board } from 'src/app/models/board.interface';
 import { Card } from 'src/app/models/card.interface';
 import { Player } from 'src/app/models/player.interface';
-import { CardHistoryComponent } from './card-history.component';
+import { CardHistoryComponent } from './card-history/card-history.component';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
-import { PlayerNameComponent } from './player-name.component';
+import { PlayerNameComponent } from './player-name/player-name.component';
 import { PlayerService } from 'src/app/providers/player.service';
 import { CardHistoryService } from 'src/app/providers/card-history.service';
 
@@ -22,11 +23,11 @@ import { CardHistoryService } from 'src/app/providers/card-history.service';
   templateUrl: './player-board.component.html',
   styleUrls: ['./player-board.component.css']
 })
-export class PlayerBoardComponent {
+export class PlayerBoardComponent implements OnInit {
 
-  board: Board;
+  @Input() board: Board;
+  @Input() players: Player[];
   cardHistory: Card[];
-  players: Player[];
 
   cards: Card[];
   player: Player;
@@ -37,27 +38,40 @@ export class PlayerBoardComponent {
               private cardService: CardService,
               private loadingService: LoadingService,
               private activatedRoute: ActivatedRoute,
+              private location: Location,
               private bottomSheet: MatBottomSheet,
               public dialog: MatDialog,
               private snackBar: MatSnackBar) {
     this.boardService.displayNavBar = false;
     this.cards = this.cardService.getCards();
-    
-    this.activatedRoute.params.subscribe(params => {
-      this.boardService.get(params['uid'])
-        .subscribe((board: Board) => {
-          this.board = board;
-          this.initializeBoard();
-          this.loadingService.loading = false;
-        });
-      this.cardHistoryService.get(params['uid'])
+  }
+
+  ngOnInit(): void {
+    if (!this.location.path().endsWith('/host'))
+      this.activatedRoute.params.subscribe(params => {
+        this.boardService.get(params['uid'])
+          .subscribe((board: Board) => {
+            this.board = board;
+            this.initializeBoard();
+            this.loadingService.loading = false;
+          });
+        this.cardHistoryService.get(params['uid'])
+          .subscribe((cards: Card[]) => {
+            this.cardHistory = cards;
+            this.player && this.showHistory(true);
+          });
+        this.playerService.get(params['uid']).subscribe((players: Player[]) => this.players = players)
+        this.initializePlayer(params['uid']);
+      });
+    else {
+      this.cardHistoryService.get(this.board.uid)
         .subscribe((cards: Card[]) => {
           this.cardHistory = cards;
           this.player && this.showHistory(true);
         });
-      this.playerService.get(params['uid']).subscribe((players: Player[]) => this.players = players)
-      this.initializePlayer(params['uid']);
-    });
+      this.initializePlayer(this.board.uid);
+      this.shuffleBoard();
+    }
   }
 
   initializePlayer = (uid: string) => {
@@ -155,6 +169,8 @@ export class PlayerBoardComponent {
   }
 
   showHistory = (lastCards: boolean = false) => {
+    console.log(this.cardHistory);
+    
     if (this.cardHistory.length > 0)
       this.bottomSheet.open(CardHistoryComponent, {
         data: {

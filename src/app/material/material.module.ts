@@ -10,6 +10,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatChipsModule,
     MatBottomSheetModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatMenuModule
   ],
   exports: [
     MatButtonModule,
@@ -36,7 +38,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatChipsModule,
     MatBottomSheetModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatMenuModule
   ]
 })
 export class MaterialModule { }
