@@ -40,10 +40,6 @@ export class NewBoardComponent implements OnInit {
     this.boardService.post(this.board)
       .then((board: DocumentReference) => {
         this.board.uid = board.id;
-        return this.playerService.post(board.id);
-      }).then(() =>
-        this.cardHistoryService.post(this.board.uid)
-      ).then(() => {
         this.loadingService.loading = false;
         this.router.navigate([`/board/${this.board.uid}/host`])
       });

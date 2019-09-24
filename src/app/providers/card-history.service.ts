@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentReference, QuerySnapshot, QueryDocumentSnapshot, DocumentChangeAction, DocumentData, DocumentChange } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 import { Card } from '../models/card.interface';
 
@@ -8,28 +8,39 @@ import { Card } from '../models/card.interface';
 })
 export class CardHistoryService {
 
-  collectionName: string = 'cardHistories';
+  collectionBoardName: string = 'boards';
+  collectionName: string = 'cardsHistory';
 
   constructor(private db: AngularFirestore) { }
-
-  post = (boardUid: string): Promise<void> => 
-    this.db.collection(this.collectionName).doc(boardUid).set({
-      cards: []
-    });
   
-  get = (boardUid: string) => this.db.collection(this.collectionName).doc(boardUid)
-    .snapshotChanges().pipe(map(data => {
+  get = (boardUid: string) => this.db.collection(this.collectionBoardName).doc(boardUid)
+    .collection(this.collectionName, ref => ref.orderBy('order', 'desc')).snapshotChanges().pipe(map((actions: DocumentChangeAction<DocumentData>[]) => {
       let cards: Card[] = []
-      data.payload.data()['cards'].forEach(_card => {
-        let card: Card = {
-          uid: _card['uid'],
-          url: _card['url']
+      actions.forEach((action: DocumentChangeAction<DocumentData>) => {
+        if(action.type === 'added') {
+          let _card = action.payload.doc.data();
+          let card: Card = {
+            cardNumber: _card['cardNumber'],
+            sound: _card['sound'],
+            url: _card['url']
+          }
+          cards.push(card);
         }
-        cards.push(card);
       });
       return cards;
     }));
   
-  put = (boardUid: string, cards: Card[]) =>
-    this.db.collection(this.collectionName).doc(boardUid).update({cards});
+  put = (boardUid: string, card: Card) =>
+    this.db.collection(this.collectionBoardName).doc(boardUid)
+      .collection(this.collectionName).add(card);
+
+  delete = (boardUid: string) =>
+    this.db.collection(this.collectionBoardName).doc(boardUid)
+      .collection(this.collectionName).get().subscribe((qs: QuerySnapshot<Card>) => {
+        const batch = this.db.firestore.batch();
+        qs.forEach((qds: QueryDocumentSnapshot<Card>) => {
+          batch.delete(qds.ref);
+        });
+        batch.commit()
+      });
 }

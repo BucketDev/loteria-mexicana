@@ -56,9 +56,14 @@ export class HostBoardComponent {
     );
   }
 
-  updateCloudCardHistory = () => {
+  addCardCloudCardHistory = () => {
+    let length = this.playingCards.length - 1;
+    let card: Card = {
+      order: length,
+      ...this.playingCards[length]
+    }
     this.loadingService.loading = true;
-    this.cardHistoryService.put(this.board.uid, this.cardHistory).then(
+    this.cardHistoryService.put(this.board.uid, card).then(
       () =>  this.loadingService.loading = false,
       error => alert(error)
     );
@@ -70,16 +75,14 @@ export class HostBoardComponent {
     this.board.gameStarted = true;
     this.board.gameWon = false;
     this.updateCloudBoard();
-    this.cardHistory = [this.playingCards[this.playingCards.length -1]];
-    this.updateCloudCardHistory();
+    this.addCardCloudCardHistory();
   }
 
   nextCard = () => {
     this.playingCards.pop();
     localStorage.setItem('playingCards', JSON.stringify(this.playingCards));
     if (this.playingCards.length > 0) {
-      this.cardHistory.push(this.playingCards[this.playingCards.length - 1]);
-      this.updateCloudCardHistory();
+      this.addCardCloudCardHistory();
     }
   }
   
@@ -87,8 +90,7 @@ export class HostBoardComponent {
     this.board.gameStarted = false;
     this.board.winners = [];
     this.updateCloudBoard();
-    this.cardHistory = [];
-    this.updateCloudCardHistory();
+    this.cardHistoryService.delete(this.board.uid);
   }
 
   shuffleDeck = () => {

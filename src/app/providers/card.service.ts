@@ -14,7 +14,8 @@ export class CardService {
     let cards: Card[] = []
     for(let idx = 1; idx <= 54; idx++) {
       let card: Card = {
-        uid: idx,
+        cardNumber: idx,
+        sound: `assets/sounds/${idx}.mp3`,
         url: `assets/img/${idx}.jpg`
       }
       cards.push(card);

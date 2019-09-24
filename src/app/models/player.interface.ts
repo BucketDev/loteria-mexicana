@@ -4,5 +4,5 @@ export interface Player {
     uid?: string,
     name: string,
     boardUid: string,
-    playerBoard: Card[]
+    playerBoard?: Card[]
 }

@@ -1,5 +1,7 @@
 export interface Card {
-    uid: number,
+    cardNumber: number,
+    sound: string,
     url: string,
+    order?: number,
     selected?: boolean
 }

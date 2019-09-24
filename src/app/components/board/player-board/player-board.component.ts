@@ -70,28 +70,23 @@ export class PlayerBoardComponent {
     const dialogRef = this.dialog.open(PlayerNameComponent, { disableClose: true, data: { name: '' } });
     dialogRef.afterClosed().subscribe(result => {
       this.player = {
-        name: result,
         boardUid: this.board.uid,
-        playerBoard: []
+        name: result
       }
-      this.players.push(this.player);
-      this.playerService.postPLayers(this.board.uid, this.players)
-        .then(() => {
+      this.shuffleBoard();
+      this.playerService.post(this.board.uid, this.player)
+        .then((data: DocumentReference) => {
+          this.player.uid = data.id;
           localStorage.setItem('player', JSON.stringify(this.player));
         });
-      this.shuffleBoard();
     });
   }
 
   updateName = () => {
     const dialogRef = this.dialog.open(PlayerNameComponent, { disableClose: true, data: { name: this.player.name } });
     dialogRef.afterClosed().subscribe(result => {
-      this.players.forEach((_player: Player) => {
-        if (this.player.name === _player.name)
-          _player.name = result;
-      });
       this.player.name = result;
-      this.playerService.postPLayers(this.board.uid, this.players)
+      this.playerService.put(this.board.uid, this.player)
         .then(
           () => localStorage.setItem('player', JSON.stringify(this.player)),
           (error) => alert(console.error())
@@ -120,7 +115,7 @@ export class PlayerBoardComponent {
   }
 
   cardSelected = (card: Card) => {
-    let found = this.cardHistory.some(_card => _card.uid === card.uid);
+    let found = this.cardHistory.some(_card => _card.cardNumber === card.cardNumber);
     if (found) {
       if (!card.selected) {
         card.selected = true;
@@ -145,7 +140,7 @@ export class PlayerBoardComponent {
 
   createCloudPlayer = () => {
     this.loadingService.loading = true;
-    this.playerService.post(this.player.boardUid).then(
+    this.playerService.post(this.board.uid, this.player).then(
       () =>  this.loadingService.loading = false,
       error => alert(error)
     )

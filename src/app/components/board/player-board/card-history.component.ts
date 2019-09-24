@@ -25,7 +25,7 @@ export class CardHistoryComponent implements OnInit {
     bottomSheetRef.afterOpened().subscribe(() =>
       document.querySelector('.card-history-container').scrollLeft = this.cardHistory.length * (110 - 50))
     data.lastCards && this.startTimer();
-    data.lastCards && new Audio(`assets/sounds/${this.cardHistory[this.cardHistory.length - 1].uid}.mp3`).play();
+    data.lastCards && new Audio(this.cardHistory[this.cardHistory.length - 1].sound).play();
   }
 
   startTimer() {

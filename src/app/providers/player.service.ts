@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentReference, DocumentChangeAction, DocumentData, DocumentChange } from '@angular/fire/firestore';
 import { Player } from '../models/player.interface';
 import { map } from 'rxjs/operators';
 
@@ -13,28 +13,26 @@ export class PlayerService {
 
   constructor(private db: AngularFirestore) { }
 
-  post = (boardUid: string): Promise<void> => 
-    this.db.collection(this.collectionName).doc(boardUid).set({
-      players: []
-    });
-  
-  postPLayers = (boardUid: string, players: Player[]): Promise<void> => 
-    this.db.collection(this.collectionName).doc(boardUid).set({players});
+  post = (boardUid: string, player: Player): Promise<DocumentReference> => 
+    this.db.collection(this.collectionBoardName).doc(boardUid).collection(this.collectionName).add(player);
 
-  get = (boardUid: string) => this.db.collection(this.collectionName).doc(boardUid)
-    .snapshotChanges().pipe(map(data => {
+  get = (boardUid: string) => this.db.collection(this.collectionBoardName).doc(boardUid)
+    .collection(this.collectionName).snapshotChanges().pipe(map((actions: DocumentChangeAction<DocumentData>[]) => {
       let players: Player[] = [];
-      data.payload.data()['players'].forEach((_player) => {
-        let player: Player = {
-          boardUid: _player['boardUid'],
-          name: _player['name'],
-          playerBoard: []
-        };
-        players.push(player);
-      });
+      actions.forEach((action: DocumentChangeAction<DocumentReference>) => {
+        if (action.type === 'added' || action.type === 'modified') {
+          let _player = action.payload.doc.data();
+          let player: Player = {
+            uid: _player['uid'],
+            boardUid: _player['boardUid'],
+            name: _player['name']
+          }
+          players.push(player);
+        }
+      })
       return players;
     }));
 
-  put = (boardUid: string, player: Player) =>
-    this.db.collection(this.collectionName)
+  put = (boardUid: string, player: Player): Promise<void> =>
+    this.db.collection(this.collectionBoardName).doc(boardUid).collection(this.collectionName).doc(player.uid).set(player);
 }
