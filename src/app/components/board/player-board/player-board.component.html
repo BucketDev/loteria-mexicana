@@ -39,10 +39,10 @@
             </div>
         </mat-toolbar-row>
     </mat-toolbar>
-    <div *ngIf="player" class="d-flex justify-content-center p-3">
-        <div class="board d-flex flex-wrap shadow-lg ml-2">
+    <div *ngIf="player" class="d-flex justify-content-center pt-2">
+        <div class="board d-flex flex-wrap shadow-lg p-2 ml-2 justify-content-between align-items-center rounded border bg-light">
             <div *ngFor="let card of player.playerBoard" [ngClass]="{'selected': card.selected}"
-                class="card justify-content-center" matRipple (click)="cardSelected(card)"
+                class="card justify-content-center border border-dark" matRipple (click)="cardSelected(card)"
                 [style.background-image]="card.url | uriStyleSanitizer">
                 <div class="chip">
                     <img src="https://png.icons8.com/flat_round/star--v3/38" alt="mark">

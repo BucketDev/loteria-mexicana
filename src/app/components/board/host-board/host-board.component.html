@@ -31,7 +31,12 @@
             </div>
         </mat-toolbar-row>
     </mat-toolbar>
-    <span *ngIf="!players || players.length === 0; else playersArrived" class="d-block py-5 h3 text-muted text-center">Esperando al primer jugador</span>
+    <div *ngIf="!players || players.length === 0; else playersArrived" class="d-flex justify-content-center mt-5">
+        <div class="d-flex flex-column justify-content-around p-3 bg-light text-muted text-center deck mat-elevation-z1">
+            <span class="h3"><strong>Esperando al primer jugador</strong></span>
+            <span class="h5">Da clic en el botón de compartir</span>
+        </div>
+    </div>
     <ng-template #playersArrived>
         <div class="d-flex m-3 justify-content-between">
             <mat-chip-list [matBadge]="players.length" [matTooltip]="getPlayers()">
@@ -54,13 +59,13 @@
             <ng-template #gameStarted>
                 <div *ngIf="cards && playingCards" class="ml-2">
                     <div *ngIf="playingCards.length === 0; else cardsLeft" class="d-flex flex-column align-items-center">
-                        <span class="d-flex justify-content-center align-items-center deck shadow-lg bg-light">
+                        <span class="d-flex justify-content-center align-items-center deck shadow-lg bg-light border border-dark rounded">
                             <img src="https://png.icons8.com/color/galo-de-barcelos/128" alt="mezclar">
                         </span>
                     </div>
                     <ng-template #cardsLeft>
                         <div *ngIf="playingCards" class="d-flex flex-column align-items-center">
-                            <div class="deck shadow-lg" matRipple (click)="nextCard()"
+                            <div class="deck shadow-lg border border-dark rounded" matRipple (click)="nextCard()"
                                 [style.background-image]="playingCards[playingCards.length - 1].url | uriStyleSanitizer">
                             </div>
                         </div>

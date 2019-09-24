@@ -1,7 +1,8 @@
 .board {
-    height: 450px;
-    width: 285px;
-    max-width: 285px;
+    height: 488px;
+    width: 324px;
+    min-width: 324px;
+    max-width: 324px;
 }
 
 .card {

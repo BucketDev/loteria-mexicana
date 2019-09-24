@@ -11,9 +11,8 @@ import { interval } from 'rxjs';
 export class CardHistoryComponent implements OnInit {
 
   cardHistory: Card[];
-  progressbarValue = 0;
   curSec: number = 0;
-  timeLapse: number = 2;
+  timeLapse: number = 1;
 
   constructor(private bottomSheetRef: MatBottomSheetRef<CardHistoryComponent>,
               private _changeDetectorRef: ChangeDetectorRef,
@@ -31,9 +30,7 @@ export class CardHistoryComponent implements OnInit {
   startTimer() {
     const timer$ = interval(1000);
     const sub = timer$.subscribe((sec) => {
-      this.progressbarValue = (sec + 1) * 100 / this.timeLapse;
       this.curSec = sec + 1;
-      this._changeDetectorRef.markForCheck();
 
       if (this.curSec === this.timeLapse) {
         sub.unsubscribe();
