@@ -50,7 +50,6 @@
     </mat-toolbar>
     <div *ngIf="!players || players.length === 0; else playersArrived" class="d-flex justify-content-center mt-5">
         <div class="d-flex flex-column justify-content-around p-3 bg-light text-muted text-center deck mat-elevation-z4 border border-secondary rounded">
-            <span class="h3"><strong>Esperando a otro jugador</strong></span>
             <span *ngIf="!canShare()" class="h5">Da clic en<br>
                 <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
                 <strong>menu >
@@ -59,7 +58,9 @@
             <span *ngIf="canShare()" class="h5">Da clic en <br>
                 <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
                 <strong>menu > 
-                <img src="https://png.icons8.com/color/share-3/24" alt="copiar"> compartir</strong><br>para invitar a tus amigos</span>
+                <img src="https://png.icons8.com/color/share-3/24" alt="copiar"> compartir</strong><br>para invitar a tus amigos
+            </span>
+            <span class="h4"><strong>Envía el enlace a las personas con quien quieras jugar</strong></span>
         </div>
     </div>
     <ng-template #playersArrived>
