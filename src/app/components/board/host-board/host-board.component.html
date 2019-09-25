@@ -31,7 +31,7 @@
                         <img src="https://png.icons8.com/cotton/wrench--v2/24" alt="configuracion">
                         <span class="ml-2">Configuración</span>
                     </button>
-                    <button *ngIf="!board.gameStarted" mat-menu-item (click)="startGame()">
+                    <button *ngIf="players?.length > 0 && !board.gameStarted" mat-menu-item (click)="startGame()">
                         <img src="https://png.icons8.com/color/start/24" alt="comenzar">
                         <span class="ml-2">Comenzar</span>
                     </button>
@@ -40,7 +40,7 @@
                         <img src="https://png.icons8.com/color/stop-squared/24" alt="terminar">
                         <span class="ml-2">Terminar</span>
                     </button>
-                    <button *ngIf="!players || !board.gameStarted" mat-menu-item (click)="enableAutoPilot()">
+                    <button *ngIf="players?.length > 0 && !board.gameStarted" mat-menu-item (click)="enableAutoPilot()">
                         <img src="https://png.icons8.com/color/air-pilot-hat/24" alt="terminar">
                         <span class="ml-2">Automático</span>
                     </button>
@@ -63,8 +63,8 @@
         </div>
     </div>
     <ng-template #playersArrived>
-        <div *ngIf="!autoPilot; else playOnHost" class="animated fadeIn p-4">
-            <div class="d-flex justify-content-between">
+        <div *ngIf="!autoPilot" class="animated fadeIn p-4">
+            <div class="d-flex justify-content-between  mb-2">
                 <mat-chip-list [matBadge]="players.length" [matTooltip]="getPlayers()">
                     <mat-chip color="accent" selected="true">Jugadores</mat-chip>
                 </mat-chip-list>
@@ -80,7 +80,7 @@
                             <strong>menu >
                             <img src="https://png.icons8.com/color/start/16" alt="comenzar"> comenzar</strong><br> para comenzar a repartir las cartas
                         </span>
-                        <span class="h3 border-top border-bottom border-dark p-2">&gt; O también &lt;</span>
+                        <span class="h6 border-top border-bottom border-dark p-2">&gt; O también &lt;</span>
                         <span class="h5">Da clic en <br>
                             <img src="https://png.icons8.com/color/menu-2/16" alt="menu">
                             <strong>menu >
@@ -109,8 +109,6 @@
                 </ng-template>
             </div>
         </div>
-        <ng-template #playOnHost>
-            <app-player-board [board]="board" [players]="players"></app-player-board>
-        </ng-template>
+            <app-player-board *ngIf="autoPilot" [board]="board" [players]="players" [autoPilot]="autoPilot"></app-player-board>
     </ng-template>
 </div>

@@ -14,7 +14,7 @@ import { SettingsBoardComponent } from '../settings-board/settings-board.compone
 import { Player } from 'src/app/models/player.interface';
 import { PlayerService } from 'src/app/providers/player.service';
 import { CardHistoryService } from 'src/app/providers/card-history.service';
-import { interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { PlayerBoardComponent } from '../player-board/player-board.component';
 
 @Component({
@@ -30,6 +30,7 @@ export class HostBoardComponent {
   
   cards: Card[];
   playingCards: Card[] = [];
+  sub: Subscription;
 
   @ViewChild(PlayerBoardComponent, { static: false }) playerBoard: PlayerBoardComponent;
   autoPilot: boolean = false;
@@ -97,17 +98,18 @@ export class HostBoardComponent {
     this.updateCloudBoard();
     this.cardHistoryService.delete(this.board.uid);
     this.autoPilot = false;
+    this.sub && this.sub.unsubscribe();
   }
 
   enableAutoPilot = () => {
     this.autoPilot = true;
     this.startGame();
     const timer$ = interval(1000);
-    const sub = timer$.subscribe((sec) => {
+    this.sub = timer$.subscribe((sec) => {
       if (sec > 0 && sec % this.timeLapse === 0) {
         this.nextCard();
         if (this.playingCards.length === 0)
-          sub.unsubscribe();
+          this.sub.unsubscribe();
       }
     });
   }
@@ -119,9 +121,6 @@ export class HostBoardComponent {
       [array[i], array[j]] = [array[j], array[i]];
     }
     localStorage.setItem('playingCards', JSON.stringify(this.playingCards));
-    this.snackBar.open('Se ha mezclado la baraja', '', {
-      duration: 1500,
-    });
   }
 
   calculateRest = () => `${this.playingCards.length}/${this.cards.length}`;

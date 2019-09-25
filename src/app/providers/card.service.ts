@@ -17,7 +17,9 @@ export class CardService {
         cardNumber: idx,
         sound: `assets/sounds/${idx}.mp3`,
         url: `assets/img/${idx}.jpg`
-      }
+      };
+      //img preload
+      (new Image()).src = card.url;
       cards.push(card);
     }
     return cards;

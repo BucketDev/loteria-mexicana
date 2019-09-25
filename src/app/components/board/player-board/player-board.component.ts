@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentReference } from '@angular/fire/firestore';
@@ -17,18 +17,21 @@ import { MatDialog } from '@angular/material/dialog';
 import { PlayerNameComponent } from './player-name/player-name.component';
 import { PlayerService } from 'src/app/providers/player.service';
 import { CardHistoryService } from 'src/app/providers/card-history.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-player-board',
   templateUrl: './player-board.component.html',
   styleUrls: ['./player-board.component.css']
 })
-export class PlayerBoardComponent implements OnInit {
+export class PlayerBoardComponent implements OnInit, OnDestroy {
 
   @Input() board: Board;
   @Input() players: Player[];
+  @Input() autoPilot: boolean = false;
+  cardHistorySub: Subscription;
+  
   cardHistory: Card[];
-
   cards: Card[];
   player: Player;
 
@@ -64,14 +67,19 @@ export class PlayerBoardComponent implements OnInit {
         this.initializePlayer(params['uid']);
       });
     else {
-      this.cardHistoryService.get(this.board.uid)
+      this.cardHistorySub = this.cardHistoryService.get(this.board.uid)
         .subscribe((cards: Card[]) => {
           this.cardHistory = cards;
-          this.player && this.showHistory(true);
+          this.showHistory(true);
         });
       this.initializePlayer(this.board.uid);
       this.shuffleBoard();
     }
+  }
+  
+  ngOnDestroy(): void {
+    this.autoPilot = false;
+    this.cardHistorySub.unsubscribe();
   }
 
   initializePlayer = (uid: string) => {
@@ -169,8 +177,6 @@ export class PlayerBoardComponent implements OnInit {
   }
 
   showHistory = (lastCards: boolean = false) => {
-    console.log(this.cardHistory);
-    
     if (this.cardHistory.length > 0)
       this.bottomSheet.open(CardHistoryComponent, {
         data: {
